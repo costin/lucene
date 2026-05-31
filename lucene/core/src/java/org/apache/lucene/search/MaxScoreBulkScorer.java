@@ -48,10 +48,12 @@ final class MaxScoreBulkScorer extends BulkScorer {
   private final DisiWrapper filter;
 
   private final FixedBitSet windowMatches = new FixedBitSet(INNER_WINDOW_SIZE);
+  private final FixedBitSet filterWindowMatches = new FixedBitSet(INNER_WINDOW_SIZE);
   private final double[] windowScores = new double[INNER_WINDOW_SIZE];
 
   private final DocAndFloatFeatureBuffer docAndScoreBuffer = new DocAndFloatFeatureBuffer();
   private final DocAndScoreAccBuffer docAndScoreAccBuffer;
+  boolean filterMaterialized;
 
   MaxScoreBulkScorer(int maxDoc, List<Scorer> scorers, Scorer filter) throws IOException {
     this.maxDoc = maxDoc;
@@ -84,6 +86,7 @@ final class MaxScoreBulkScorer extends BulkScorer {
   @Override
   public int score(LeafCollector collector, Bits acceptDocs, int min, int max) throws IOException {
     collector.setScorer(scorable);
+    DisiWrapper filter = this.filter;
 
     // This scorer computes outer windows based on impacts that are stored in the index. These outer
     // windows should be small enough to provide good upper bounds of scores, and big enough to make
@@ -94,7 +97,7 @@ final class MaxScoreBulkScorer extends BulkScorer {
     int outerWindowMin = min;
     outer:
     while (outerWindowMin < max) {
-      int outerWindowMax = computeOuterWindowMax(outerWindowMin);
+      int outerWindowMax = computeOuterWindowMax(outerWindowMin, filter);
       outerWindowMax = Math.min(outerWindowMax, max);
 
       while (true) {
@@ -115,7 +118,7 @@ final class MaxScoreBulkScorer extends BulkScorer {
         // set of essential and non-essential scorers, in which case there may be multiple
         // iterations of this loop.
 
-        int newOuterWindowMax = computeOuterWindowMax(outerWindowMin);
+        int newOuterWindowMax = computeOuterWindowMax(outerWindowMin, filter);
         if (newOuterWindowMax >= outerWindowMax) {
           break;
         }
@@ -145,10 +148,20 @@ final class MaxScoreBulkScorer extends BulkScorer {
     return nextCandidate(max);
   }
 
+  private boolean shouldMaterializeFilter(DisiWrapper filter) {
+    return filter.twoPhaseView == null
+        && filter.cost >= Math.max(1, maxDoc >>> 3)
+        && filter.cost <= Math.max(1, maxDoc >>> 1);
+  }
+
   private void scoreInnerWindow(
       LeafCollector collector, Bits acceptDocs, int max, DisiWrapper filter) throws IOException {
     if (filter != null) {
-      scoreInnerWindowWithFilter(collector, acceptDocs, max, filter);
+      if (shouldMaterializeFilter(filter)) {
+        scoreInnerWindowWithFilterBitSet(collector, acceptDocs, max, filter);
+      } else {
+        scoreInnerWindowWithFilter(collector, acceptDocs, max, filter);
+      }
     } else {
       DisiWrapper top = essentialQueue.top();
       DisiWrapper top2 = essentialQueue.top2();
@@ -162,6 +175,37 @@ final class MaxScoreBulkScorer extends BulkScorer {
         scoreInnerWindowMultipleEssentialClauses(collector, acceptDocs, max);
       }
     }
+  }
+
+  private void scoreInnerWindowWithFilterBitSet(
+      LeafCollector collector, Bits acceptDocs, int max, DisiWrapper filter) throws IOException {
+    DisiWrapper top = essentialQueue.top();
+    assert top.doc < max;
+    int innerWindowMin = top.doc;
+    int innerWindowMax = MathUtil.unsignedMin(max, innerWindowMin + INNER_WINDOW_SIZE);
+    Bits windowAcceptDocs = materializeFilter(filter, acceptDocs, innerWindowMin, innerWindowMax);
+    try {
+      scoreInnerWindow(collector, windowAcceptDocs, innerWindowMax, null);
+    } finally {
+      filterWindowMatches.clear();
+    }
+  }
+
+  private Bits materializeFilter(
+      DisiWrapper filter, Bits acceptDocs, int innerWindowMin, int innerWindowMax)
+      throws IOException {
+    DocIdSetIterator approximation = filter.approximation;
+    if (approximation.docID() < innerWindowMin) {
+      filter.doc = approximation.advance(innerWindowMin);
+    } else {
+      filter.doc = approximation.docID();
+    }
+    if (filter.doc < innerWindowMax) {
+      approximation.intoBitSet(innerWindowMax, filterWindowMatches, innerWindowMin);
+      filter.doc = approximation.docID();
+    }
+    filterMaterialized = true;
+    return new WindowFilterBits(filterWindowMatches, innerWindowMin, acceptDocs);
   }
 
   private void scoreInnerWindowWithFilter(
@@ -281,7 +325,7 @@ final class MaxScoreBulkScorer extends BulkScorer {
     scoreNonEssentialClauses(collector, docAndScoreAccBuffer, firstEssentialScorer);
   }
 
-  private int computeOuterWindowMax(int windowMin) throws IOException {
+  private int computeOuterWindowMax(int windowMin, DisiWrapper filter) throws IOException {
     // Only use essential scorers to compute the window's max doc ID, in order to avoid constantly
     // recomputing max scores over small windows
     final int firstWindowLead = Math.min(firstEssentialScorer, allScorers.length - 1);
@@ -456,5 +500,44 @@ final class MaxScoreBulkScorer extends BulkScorer {
   @Override
   public long cost() {
     return cost;
+  }
+
+  private static class WindowFilterBits implements Bits {
+    private final FixedBitSet filterBits;
+    private final int filterOffset;
+    private final Bits acceptDocs;
+
+    private WindowFilterBits(FixedBitSet filterBits, int filterOffset, Bits acceptDocs) {
+      this.filterBits = filterBits;
+      this.filterOffset = filterOffset;
+      this.acceptDocs = acceptDocs;
+    }
+
+    @Override
+    public boolean get(int index) {
+      int bit = index - filterOffset;
+      return bit >= 0
+          && bit < filterBits.length()
+          && filterBits.get(bit)
+          && (acceptDocs == null || acceptDocs.get(index));
+    }
+
+    @Override
+    public int length() {
+      return acceptDocs == null ? filterOffset + filterBits.length() : acceptDocs.length();
+    }
+
+    @Override
+    public void applyMask(FixedBitSet bitSet, int offset) {
+      if (offset == filterOffset) {
+        filterBits.applyMask(bitSet, 0);
+      } else {
+        Bits.super.applyMask(bitSet, offset);
+        return;
+      }
+      if (acceptDocs != null) {
+        acceptDocs.applyMask(bitSet, offset);
+      }
+    }
   }
 }

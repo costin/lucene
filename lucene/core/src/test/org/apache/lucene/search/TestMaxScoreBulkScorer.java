@@ -17,8 +17,10 @@
 package org.apache.lucene.search;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Store;
@@ -60,6 +62,27 @@ public class TestMaxScoreBulkScorer extends LuceneTestCase {
         for (int i = 1; i < MaxScoreBulkScorer.INNER_WINDOW_SIZE; ++i) {
           w.addDocument(new Document());
         }
+      }
+      w.forceMerge(1);
+    }
+  }
+
+  private void writeFilterDocuments(Directory dir, int filterInterval) throws IOException {
+    try (IndexWriter w =
+        new IndexWriter(dir, newIndexWriterConfig().setMergePolicy(newLogMergePolicy()))) {
+      int maxDoc = MaxScoreBulkScorer.INNER_WINDOW_SIZE * 2;
+      for (int docID = 0; docID < maxDoc; docID++) {
+        Document doc = new Document();
+        if (matchesFilter(docID, filterInterval)) {
+          doc.add(new StringField("filter", "yes", Field.Store.NO));
+        }
+        if (docID % 2 == 0) {
+          doc.add(new StringField("foo", "A", Field.Store.NO));
+        }
+        if (docID % 3 == 0) {
+          doc.add(new StringField("foo", "B", Field.Store.NO));
+        }
+        w.addDocument(doc);
       }
       w.forceMerge(1);
     }
@@ -275,6 +298,72 @@ public class TestMaxScoreBulkScorer extends LuceneTestCase {
             null,
             0,
             DocIdSetIterator.NO_MORE_DOCS);
+      }
+    }
+  }
+
+  public void testMidSelectivityFilterIsMaterialized() throws Exception {
+    try (Directory dir = newDirectory()) {
+      writeFilterDocuments(dir, 5);
+
+      try (IndexReader reader = DirectoryReader.open(dir)) {
+        IndexSearcher searcher = newSearcher(reader);
+        LeafReaderContext context = searcher.getIndexReader().leaves().get(0);
+        MaxScoreBulkScorer scorer = newMaxScoreBulkScorer(searcher, context);
+        CountingLeafCollector collector = new CountingLeafCollector();
+        Bits acceptDocs =
+            new Bits() {
+              @Override
+              public boolean get(int index) {
+                return index % 5 != 0;
+              }
+
+              @Override
+              public int length() {
+                return context.reader().maxDoc();
+              }
+            };
+
+        scorer.score(collector, acceptDocs, 0, DocIdSetIterator.NO_MORE_DOCS);
+
+        assertTrue(scorer.filterMaterialized);
+        assertEquals(expectedFilterMatches(context.reader().maxDoc(), 5, true), collector.docs);
+      }
+    }
+  }
+
+  public void testSparseFilterUsesIteratorPath() throws Exception {
+    try (Directory dir = newDirectory()) {
+      writeFilterDocuments(dir, 32);
+
+      try (IndexReader reader = DirectoryReader.open(dir)) {
+        IndexSearcher searcher = newSearcher(reader);
+        LeafReaderContext context = searcher.getIndexReader().leaves().get(0);
+        MaxScoreBulkScorer scorer = newMaxScoreBulkScorer(searcher, context);
+        CountingLeafCollector collector = new CountingLeafCollector();
+
+        scorer.score(collector, null, 0, DocIdSetIterator.NO_MORE_DOCS);
+
+        assertFalse(scorer.filterMaterialized);
+        assertEquals(expectedFilterMatches(context.reader().maxDoc(), 32, false), collector.docs);
+      }
+    }
+  }
+
+  public void testVeryDenseFilterUsesIteratorPath() throws Exception {
+    try (Directory dir = newDirectory()) {
+      writeFilterDocuments(dir, -5);
+
+      try (IndexReader reader = DirectoryReader.open(dir)) {
+        IndexSearcher searcher = newSearcher(reader);
+        LeafReaderContext context = searcher.getIndexReader().leaves().get(0);
+        MaxScoreBulkScorer scorer = newMaxScoreBulkScorer(searcher, context);
+        CountingLeafCollector collector = new CountingLeafCollector();
+
+        scorer.score(collector, null, 0, DocIdSetIterator.NO_MORE_DOCS);
+
+        assertFalse(scorer.filterMaterialized);
+        assertEquals(expectedFilterMatches(context.reader().maxDoc(), -5, false), collector.docs);
       }
     }
   }
@@ -496,6 +585,54 @@ public class TestMaxScoreBulkScorer extends LuceneTestCase {
             0,
             DocIdSetIterator.NO_MORE_DOCS);
       }
+    }
+  }
+
+  private MaxScoreBulkScorer newMaxScoreBulkScorer(IndexSearcher searcher, LeafReaderContext context)
+      throws IOException {
+    Query clause1 =
+        new BoostQuery(new ConstantScoreQuery(new TermQuery(new Term("foo", "A"))), 2);
+    Query clause2 = new ConstantScoreQuery(new TermQuery(new Term("foo", "B")));
+    Query filter = new TermQuery(new Term("filter", "yes"));
+    Scorer scorer1 =
+        searcher.createWeight(searcher.rewrite(clause1), ScoreMode.TOP_SCORES, 1f).scorer(context);
+    Scorer scorer2 =
+        searcher.createWeight(searcher.rewrite(clause2), ScoreMode.TOP_SCORES, 1f).scorer(context);
+    Scorer filterScorer =
+        searcher.createWeight(searcher.rewrite(filter), ScoreMode.TOP_SCORES, 1f).scorer(context);
+    return new MaxScoreBulkScorer(
+        context.reader().maxDoc(), Arrays.asList(scorer1, scorer2), filterScorer);
+  }
+
+  private List<Integer> expectedFilterMatches(int maxDoc, int filterInterval, boolean withAcceptDocs) {
+    List<Integer> expected = new ArrayList<>();
+    for (int docID = 0; docID < maxDoc; docID++) {
+      boolean filterMatches = matchesFilter(docID, filterInterval);
+      boolean queryMatches = docID % 2 == 0 || docID % 3 == 0;
+      boolean accepted = withAcceptDocs == false || docID % 5 != 0;
+      if (filterMatches && queryMatches && accepted) {
+        expected.add(docID);
+      }
+    }
+    return expected;
+  }
+
+  private static boolean matchesFilter(int docID, int filterInterval) {
+    if (filterInterval < 0) {
+      return docID % -filterInterval != 0;
+    }
+    return docID % filterInterval == 0;
+  }
+
+  private static class CountingLeafCollector implements LeafCollector {
+    final List<Integer> docs = new ArrayList<>();
+
+    @Override
+    public void setScorer(Scorable scorer) {}
+
+    @Override
+    public void collect(int doc) {
+      docs.add(doc);
     }
   }
 
