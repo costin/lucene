@@ -53,7 +53,7 @@ final class MaxScoreBulkScorer extends BulkScorer {
 
   private final DocAndFloatFeatureBuffer docAndScoreBuffer = new DocAndFloatFeatureBuffer();
   private final DocAndScoreAccBuffer docAndScoreAccBuffer;
-  boolean filterMaterialized;
+  boolean filterBitSetPathTaken;
 
   MaxScoreBulkScorer(int maxDoc, List<Scorer> scorers, Scorer filter) throws IOException {
     this.maxDoc = maxDoc;
@@ -86,6 +86,7 @@ final class MaxScoreBulkScorer extends BulkScorer {
   @Override
   public int score(LeafCollector collector, Bits acceptDocs, int min, int max) throws IOException {
     collector.setScorer(scorable);
+    filterBitSetPathTaken = false;
     DisiWrapper filter = this.filter;
 
     // This scorer computes outer windows based on impacts that are stored in the index. These outer
@@ -149,9 +150,7 @@ final class MaxScoreBulkScorer extends BulkScorer {
   }
 
   private boolean shouldMaterializeFilter(DisiWrapper filter) {
-    return filter.twoPhaseView == null
-        && filter.cost >= Math.max(1, maxDoc >>> 3)
-        && filter.cost <= Math.max(1, maxDoc >>> 1);
+    return filter.twoPhaseView == null && filter.cost >= Math.max(1, maxDoc >>> 5);
   }
 
   private void scoreInnerWindow(
@@ -181,6 +180,10 @@ final class MaxScoreBulkScorer extends BulkScorer {
       LeafCollector collector, Bits acceptDocs, int max, DisiWrapper filter) throws IOException {
     DisiWrapper top = essentialQueue.top();
     assert top.doc < max;
+    while (top.doc < filter.doc) {
+      top.doc = top.iterator.advance(filter.doc);
+      top = essentialQueue.updateTop();
+    }
     int innerWindowMin = top.doc;
     int innerWindowMax = MathUtil.unsignedMin(max, innerWindowMin + INNER_WINDOW_SIZE);
     Bits windowAcceptDocs = materializeFilter(filter, acceptDocs, innerWindowMin, innerWindowMax);
@@ -201,19 +204,16 @@ final class MaxScoreBulkScorer extends BulkScorer {
       filter.doc = approximation.docID();
     }
     if (filter.doc < innerWindowMax) {
+      assert filterWindowMatches.scanIsEmpty();
       approximation.intoBitSet(innerWindowMax, filterWindowMatches, innerWindowMin);
       filter.doc = approximation.docID();
     }
-    filterMaterialized = true;
+    filterBitSetPathTaken = true;
     return new WindowFilterBits(filterWindowMatches, innerWindowMin, acceptDocs);
   }
 
   private void scoreInnerWindowWithFilter(
       LeafCollector collector, Bits acceptDocs, int max, DisiWrapper filter) throws IOException {
-
-    // TODO: Sometimes load the filter into a bitset and use the more optimized execution paths with
-    // this bitset as `acceptDocs`
-
     DisiWrapper top = essentialQueue.top();
     assert top.doc < max;
     while (top.doc < filter.doc) {

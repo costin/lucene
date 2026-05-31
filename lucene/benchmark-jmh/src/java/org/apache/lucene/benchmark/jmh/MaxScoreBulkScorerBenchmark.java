@@ -73,7 +73,7 @@ public class MaxScoreBulkScorerBenchmark {
   @Param({"12", "45"})
   public int clauseCount;
 
-  @Param({"none", "0.05", "0.2", "0.8"})
+  @Param({"none", "0.01", "0.03", "0.03125", "0.05", "0.1", "0.2", "0.5", "0.8", "0.95"})
   public String filterSelectivity;
 
   private Directory dir;
@@ -113,6 +113,9 @@ public class MaxScoreBulkScorerBenchmark {
       Query termQuery = new TermQuery(new Term(TEXT_FIELD, "t" + i));
       builder.add(new BoostQuery(termQuery, 1f + (i % 5) * 0.2f), Occur.SHOULD);
     }
+    // Keep this at exactly 1: filtered optional clauses only route to MaxScoreBulkScorer when
+    // BooleanScorerSupplier.filteredOptionalBulkScorer() sees minShouldMatch == 1.
+    builder.setMinimumNumberShouldMatch(1);
     if (filterSelectivity.equals("none") == false) {
       builder.add(new TermQuery(new Term(FILTER_FIELD, FILTER_VALUE)), Occur.FILTER);
     }
@@ -122,9 +125,15 @@ public class MaxScoreBulkScorerBenchmark {
   private boolean matchesFilter(int docID) {
     return switch (filterSelectivity) {
       case "none" -> false;
+      case "0.01" -> docID % 100 == 0;
+      case "0.03" -> docID % 100 < 3;
+      case "0.03125" -> docID % 32 == 0;
       case "0.05" -> docID % 20 == 0;
+      case "0.1" -> docID % 10 == 0;
       case "0.2" -> docID % 5 == 0;
+      case "0.5" -> docID % 2 == 0;
       case "0.8" -> docID % 5 != 0;
+      case "0.95" -> docID % 20 != 0;
       default -> throw new IllegalArgumentException("Unknown selectivity: " + filterSelectivity);
     };
   }

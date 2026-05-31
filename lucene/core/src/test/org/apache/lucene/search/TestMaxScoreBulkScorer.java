@@ -326,13 +326,49 @@ public class TestMaxScoreBulkScorer extends LuceneTestCase {
 
         scorer.score(collector, acceptDocs, 0, DocIdSetIterator.NO_MORE_DOCS);
 
-        assertTrue(scorer.filterMaterialized);
+        assertTrue(scorer.filterBitSetPathTaken);
         assertEquals(expectedFilterMatches(context.reader().maxDoc(), 5, true), collector.docs);
       }
     }
   }
 
   public void testSparseFilterUsesIteratorPath() throws Exception {
+    try (Directory dir = newDirectory()) {
+      writeFilterDocuments(dir, 64);
+
+      try (IndexReader reader = DirectoryReader.open(dir)) {
+        IndexSearcher searcher = newSearcher(reader);
+        LeafReaderContext context = searcher.getIndexReader().leaves().get(0);
+        MaxScoreBulkScorer scorer = newMaxScoreBulkScorer(searcher, context);
+        CountingLeafCollector collector = new CountingLeafCollector();
+
+        scorer.score(collector, null, 0, DocIdSetIterator.NO_MORE_DOCS);
+
+        assertFalse(scorer.filterBitSetPathTaken);
+        assertEquals(expectedFilterMatches(context.reader().maxDoc(), 64, false), collector.docs);
+      }
+    }
+  }
+
+  public void testJustBelowThresholdFilterUsesIteratorPath() throws Exception {
+    try (Directory dir = newDirectory()) {
+      writeFilterDocuments(dir, 33);
+
+      try (IndexReader reader = DirectoryReader.open(dir)) {
+        IndexSearcher searcher = newSearcher(reader);
+        LeafReaderContext context = searcher.getIndexReader().leaves().get(0);
+        MaxScoreBulkScorer scorer = newMaxScoreBulkScorer(searcher, context);
+        CountingLeafCollector collector = new CountingLeafCollector();
+
+        scorer.score(collector, null, 0, DocIdSetIterator.NO_MORE_DOCS);
+
+        assertFalse(scorer.filterBitSetPathTaken);
+        assertEquals(expectedFilterMatches(context.reader().maxDoc(), 33, false), collector.docs);
+      }
+    }
+  }
+
+  public void testThresholdFilterIsMaterialized() throws Exception {
     try (Directory dir = newDirectory()) {
       writeFilterDocuments(dir, 32);
 
@@ -344,13 +380,13 @@ public class TestMaxScoreBulkScorer extends LuceneTestCase {
 
         scorer.score(collector, null, 0, DocIdSetIterator.NO_MORE_DOCS);
 
-        assertFalse(scorer.filterMaterialized);
+        assertTrue(scorer.filterBitSetPathTaken);
         assertEquals(expectedFilterMatches(context.reader().maxDoc(), 32, false), collector.docs);
       }
     }
   }
 
-  public void testVeryDenseFilterUsesIteratorPath() throws Exception {
+  public void testVeryDenseFilterIsMaterialized() throws Exception {
     try (Directory dir = newDirectory()) {
       writeFilterDocuments(dir, -5);
 
@@ -362,8 +398,30 @@ public class TestMaxScoreBulkScorer extends LuceneTestCase {
 
         scorer.score(collector, null, 0, DocIdSetIterator.NO_MORE_DOCS);
 
-        assertFalse(scorer.filterMaterialized);
+        assertTrue(scorer.filterBitSetPathTaken);
         assertEquals(expectedFilterMatches(context.reader().maxDoc(), -5, false), collector.docs);
+      }
+    }
+  }
+
+  public void testTwoPhaseFilterUsesIteratorPath() throws Exception {
+    try (Directory dir = newDirectory()) {
+      writeFilterDocuments(dir, 5);
+
+      try (IndexReader reader = DirectoryReader.open(dir)) {
+        IndexSearcher searcher = newSearcher(reader);
+        LeafReaderContext context = searcher.getIndexReader().leaves().get(0);
+        // Plain TermQuery filters at this selectivity use the bitset path; the two-phase wrapper
+        // must keep the safer iterator path.
+        Query filter =
+            new RandomApproximationQuery(new TermQuery(new Term("filter", "yes")), random());
+        MaxScoreBulkScorer scorer = newMaxScoreBulkScorer(searcher, context, filter);
+        CountingLeafCollector collector = new CountingLeafCollector();
+
+        scorer.score(collector, null, 0, DocIdSetIterator.NO_MORE_DOCS);
+
+        assertFalse(scorer.filterBitSetPathTaken);
+        assertEquals(expectedFilterMatches(context.reader().maxDoc(), 5, false), collector.docs);
       }
     }
   }
@@ -588,12 +646,15 @@ public class TestMaxScoreBulkScorer extends LuceneTestCase {
     }
   }
 
-  private MaxScoreBulkScorer newMaxScoreBulkScorer(IndexSearcher searcher, LeafReaderContext context)
-      throws IOException {
-    Query clause1 =
-        new BoostQuery(new ConstantScoreQuery(new TermQuery(new Term("foo", "A"))), 2);
+  private MaxScoreBulkScorer newMaxScoreBulkScorer(
+      IndexSearcher searcher, LeafReaderContext context) throws IOException {
+    return newMaxScoreBulkScorer(searcher, context, new TermQuery(new Term("filter", "yes")));
+  }
+
+  private MaxScoreBulkScorer newMaxScoreBulkScorer(
+      IndexSearcher searcher, LeafReaderContext context, Query filter) throws IOException {
+    Query clause1 = new BoostQuery(new ConstantScoreQuery(new TermQuery(new Term("foo", "A"))), 2);
     Query clause2 = new ConstantScoreQuery(new TermQuery(new Term("foo", "B")));
-    Query filter = new TermQuery(new Term("filter", "yes"));
     Scorer scorer1 =
         searcher.createWeight(searcher.rewrite(clause1), ScoreMode.TOP_SCORES, 1f).scorer(context);
     Scorer scorer2 =
@@ -604,7 +665,8 @@ public class TestMaxScoreBulkScorer extends LuceneTestCase {
         context.reader().maxDoc(), Arrays.asList(scorer1, scorer2), filterScorer);
   }
 
-  private List<Integer> expectedFilterMatches(int maxDoc, int filterInterval, boolean withAcceptDocs) {
+  private List<Integer> expectedFilterMatches(
+      int maxDoc, int filterInterval, boolean withAcceptDocs) {
     List<Integer> expected = new ArrayList<>();
     for (int docID = 0; docID < maxDoc; docID++) {
       boolean filterMatches = matchesFilter(docID, filterInterval);
