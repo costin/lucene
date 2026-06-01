@@ -17,11 +17,38 @@
 
 ## lucene-13b: Deferred applyMask in MaxScoreBulkScorer Multi-Essential Path
 
+**Status**: DEFERRED — fold into TermScorer bulk intoBitSet work (see below)
+
 **Goal**: Replace per-doc `WindowFilterBits.get()` with a single bulk `applyMask()` AND per inner window in the multi-essential clause path.
 
 **Depends on**: lucene-13 (filter bitset materialization, merged)
 **Scope**: `MaxScoreBulkScorer.scoreInnerWindowMultipleEssentialClauses` only
 **LOC estimate**: ~20
+
+---
+
+## Decision: Not worth shipping standalone
+
+Benchmarked with 75% density gate and with no gate. Results vs lucene-13 baseline:
+
+| filter | 75% gate (cc=12) | 75% gate (cc=45) | no gate (cc=12) | no gate (cc=45) |
+|-------:|-----------------:|-----------------:|----------------:|----------------:|
+| 0.05 | -1% | +1% | **-26%** | **-26%** |
+| 0.1 | +0% | +21% (noise) | **-22%** | **-25%** |
+| 0.2 | +2% | +10% (noise) | **-20%** | **-7%** |
+| 0.5 | +1% | -1% | -3% | **-11%** |
+| 0.8 | -5% | -5% | -4% | +1% |
+| 0.95 | +1% | **+12%** | +2% | **+10%** |
+
+**Findings**:
+- Only sel=0.95 shows consistent improvement (+10-12%)
+- sel=0.8 regresses -5% even with the 75% gate
+- Without the gate, regressions are 20-27% at sel ≤ 0.2
+- The cc=45/sel=0.1/0.2 gated results (+21%, +10%) are noise — deferred doesn't activate below 75%
+
+**Root cause**: passing `null` as `acceptDocs` to `nextDocsAndScores` scores ALL docs then discards filtered ones. The wasted `scorer.score()` cost at medium densities overwhelms the `applyMask()` savings. Only at ≥95% density is the waste negligible enough for bulk AND to win.
+
+**Path forward**: this optimization becomes viable when `TermScorer.nextDocsAndScores` gets a bulk `intoBitSet` mode that collects doc IDs into a bitset without scoring. Then the deferred path collects docs (no score waste) and applies `applyMask` in bulk. That eliminates the fundamental tradeoff — no wasted scores at any density.
 
 ---
 

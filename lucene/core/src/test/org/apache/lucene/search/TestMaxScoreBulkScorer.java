@@ -332,6 +332,76 @@ public class TestMaxScoreBulkScorer extends LuceneTestCase {
     }
   }
 
+  public void testDeferredFilterMaskDoesNotLeakScores() throws Exception {
+    try (Directory dir = newDirectory()) {
+      int secondWindowDoc = MaxScoreBulkScorer.INNER_WINDOW_SIZE + 1;
+      try (IndexWriter w =
+          new IndexWriter(dir, newIndexWriterConfig().setMergePolicy(newLogMergePolicy()))) {
+        for (int docID = 0; docID <= secondWindowDoc; docID++) {
+          Document doc = new Document();
+          if (docID != 1) {
+            doc.add(new StringField("filter", "yes", Field.Store.NO));
+          }
+          if (docID == 1 || docID == secondWindowDoc) {
+            doc.add(new StringField("foo", "A", Field.Store.NO));
+            doc.add(new StringField("foo", "B", Field.Store.NO));
+          }
+          w.addDocument(doc);
+        }
+        w.forceMerge(1);
+      }
+
+      try (IndexReader reader = DirectoryReader.open(dir)) {
+        IndexSearcher searcher = newSearcher(reader);
+        Query clause1 =
+            new BoostQuery(new ConstantScoreQuery(new TermQuery(new Term("foo", "A"))), 2);
+        Query clause2 =
+            new BoostQuery(new ConstantScoreQuery(new TermQuery(new Term("foo", "B"))), 3);
+        Query filter = new TermQuery(new Term("filter", "yes"));
+        LeafReaderContext context = searcher.getIndexReader().leaves().get(0);
+        Scorer scorer1 =
+            searcher
+                .createWeight(searcher.rewrite(clause1), ScoreMode.TOP_SCORES, 1f)
+                .scorer(context);
+        Scorer scorer2 =
+            searcher
+                .createWeight(searcher.rewrite(clause2), ScoreMode.TOP_SCORES, 1f)
+                .scorer(context);
+        Scorer filterScorer =
+            searcher
+                .createWeight(searcher.rewrite(filter), ScoreMode.TOP_SCORES, 1f)
+                .scorer(context);
+        MaxScoreBulkScorer scorer =
+            new MaxScoreBulkScorer(
+                context.reader().maxDoc(), Arrays.asList(scorer1, scorer2), filterScorer);
+        List<Integer> docs = new ArrayList<>();
+
+        scorer.score(
+            new LeafCollector() {
+              private Scorable scorer;
+
+              @Override
+              public void setScorer(Scorable scorer) {
+                this.scorer = scorer;
+              }
+
+              @Override
+              public void collect(int doc) throws IOException {
+                assertEquals(secondWindowDoc, doc);
+                assertEquals(2 + 3, scorer.score(), 0f);
+                docs.add(doc);
+              }
+            },
+            null,
+            0,
+            DocIdSetIterator.NO_MORE_DOCS);
+
+        assertTrue(scorer.filterBitSetPathTaken);
+        assertEquals(Collections.singletonList(secondWindowDoc), docs);
+      }
+    }
+  }
+
   public void testSparseFilterUsesIteratorPath() throws Exception {
     try (Directory dir = newDirectory()) {
       writeFilterDocuments(dir, 64);
