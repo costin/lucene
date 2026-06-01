@@ -78,6 +78,10 @@ public abstract class ConstantScoreScorerSupplier extends ScorerSupplier {
   public final BulkScorer bulkScorer() throws IOException {
     DocIdSetIterator iterator = iterator(Long.MAX_VALUE);
     TwoPhaseIterator twoPhase = TwoPhaseIterator.unwrap(iterator);
+    if (scoreMode.needsScores() == false
+        && iterator instanceof BatchDocValuesRangeIterator batchIterator) {
+      return batchIterator.bulkScorer(score);
+    }
     if (maxDoc >= DenseConjunctionBulkScorer.WINDOW_SIZE / 2
         && iterator.cost() >= maxDoc / DenseConjunctionBulkScorer.DENSITY_THRESHOLD_INVERSE) {
       List<DocIdSetIterator> iterators;

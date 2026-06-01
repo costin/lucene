@@ -16,6 +16,7 @@
  */
 package org.apache.lucene.search;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -97,6 +98,40 @@ public class TestSkipBlockRangeIteratorIntoBitSet extends BaseDocValuesSkipperTe
             + " but got: "
             + iter.getClass().getSimpleName(),
         iter instanceof BatchDocValuesRangeIterator);
+    BulkScorer bulkScorer = weight.bulkScorer(ctx);
+    assertTrue(
+        "Range query on single-valued field with skip index must use DocValuesRangeBulkScorer"
+            + " but got: "
+            + bulkScorer.getClass().getSimpleName(),
+        bulkScorer instanceof DocValuesRangeBulkScorer);
+  }
+
+  public void testBulkScorerUsesCollectRangeForYesBlocks() throws Exception {
+    try (Directory rangeDir = newDirectory()) {
+      IndexWriterConfig iwc = new IndexWriterConfig().setCodec(new Lucene104Codec());
+      try (IndexWriter w = new IndexWriter(rangeDir, iwc)) {
+        for (int i = 0; i < 4096 * 2; i++) {
+          Document doc = new Document();
+          doc.add(NumericDocValuesField.indexedField("range", i < 4096 ? 10 : 1000));
+          w.addDocument(doc);
+        }
+        w.forceMerge(1);
+      }
+
+      try (DirectoryReader rangeReader = DirectoryReader.open(rangeDir)) {
+        IndexSearcher rangeSearcher = new IndexSearcher(rangeReader);
+        Query query = SortedNumericDocValuesField.newSlowRangeQuery("range", 0, 20);
+        Weight weight = query.createWeight(rangeSearcher, ScoreMode.COMPLETE_NO_SCORES, 1f);
+        BulkScorer bulkScorer = weight.bulkScorer(rangeReader.leaves().get(0));
+        CountingLeafCollector collector = new CountingLeafCollector();
+
+        bulkScorer.score(collector, null, 0, rangeReader.maxDoc());
+
+        assertEquals(4096, collector.count);
+        assertTrue("YES blocks should be collected via collectRange", collector.rangeCount > 0);
+        assertEquals("YES-only query should not need a bitset stream", 0, collector.streamCount);
+      }
+    }
   }
 
   public void testSingleFieldRangeCorrectness() throws Exception {
@@ -596,6 +631,31 @@ public class TestSkipBlockRangeIteratorIntoBitSet extends BaseDocValuesSkipperTe
               actual);
         }
       }
+    }
+  }
+  private static class CountingLeafCollector implements LeafCollector {
+    int count;
+    int rangeCount;
+    int streamCount;
+
+    @Override
+    public void setScorer(Scorable scorer) {}
+
+    @Override
+    public void collect(int doc) {
+      count++;
+    }
+
+    @Override
+    public void collectRange(int min, int max) {
+      rangeCount++;
+      count += max - min;
+    }
+
+    @Override
+    public void collect(DocIdStream stream) throws IOException {
+      streamCount++;
+      count += stream.count();
     }
   }
 }

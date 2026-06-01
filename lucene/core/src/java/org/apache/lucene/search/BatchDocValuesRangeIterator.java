@@ -46,6 +46,10 @@ public final class BatchDocValuesRangeIterator extends DocIdSetIterator {
     this.maxValue = maxValue;
   }
 
+  BulkScorer bulkScorer(float score) {
+    return new DocValuesRangeBulkScorer(score, blockIterator, values, minValue, maxValue);
+  }
+
   @Override
   public int docID() {
     return doc;
