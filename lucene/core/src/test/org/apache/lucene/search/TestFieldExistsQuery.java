@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.not;
 
 import java.io.IOException;
+import org.apache.lucene.codecs.lucene104.Lucene104Codec;
 import org.apache.lucene.document.BinaryPoint;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleDocValuesField;
@@ -38,6 +39,8 @@ import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.NoMergePolicy;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause.Occur;
@@ -112,6 +115,38 @@ public class TestFieldExistsQuery extends LuceneTestCase {
         MatchAllDocsQuery.INSTANCE, new FieldExistsQuery("dim").rewrite(newSearcher(reader)));
     reader.close();
     dir.close();
+  }
+
+  public void testDocValuesScorerSupplierUsesConstantScoreScorerSupplier() throws IOException {
+    try (Directory dir = newDirectory()) {
+      IndexWriterConfig iwc = newIndexWriterConfig().setCodec(new Lucene104Codec());
+      try (IndexWriter w = new IndexWriter(dir, iwc)) {
+        for (int i = 0; i < 4096; i++) {
+          Document doc = new Document();
+          if ((i & 1) == 0) {
+            doc.add(NumericDocValuesField.indexedField("num", i));
+          }
+          w.addDocument(doc);
+        }
+        w.forceMerge(1);
+
+        try (IndexReader reader = DirectoryReader.open(w)) {
+          IndexSearcher searcher = newSearcher(reader);
+          assertThat(
+              new FieldExistsQuery("num").rewrite(searcher),
+              not(instanceOf(MatchAllDocsQuery.class)));
+
+          Weight weight =
+              new FieldExistsQuery("num").createWeight(searcher, ScoreMode.COMPLETE_NO_SCORES, 1f);
+          ScorerSupplier scorerSupplier = weight.scorerSupplier(reader.leaves().get(0));
+
+          assertNotNull(scorerSupplier);
+          assertTrue(
+              scorerSupplier.getClass().getName(),
+              scorerSupplier instanceof ConstantScoreScorerSupplier);
+        }
+      }
+    }
   }
 
   public void testDocValuesNoRewrite() throws IOException {
