@@ -423,6 +423,16 @@ final class BooleanScorerSupplier extends ScorerSupplier {
           && maxDoc >= DenseConjunctionBulkScorer.WINDOW_SIZE
           && leadCost >= maxDoc / DenseConjunctionBulkScorer.DENSITY_THRESHOLD_INVERSE) {
         return DenseConjunctionBulkScorer.of(requiredNoScoring, maxDoc, 0f);
+      } else if (scoreMode.needsScores() == false
+          && leadCost >= DenseConjunctionBulkScorer.WINDOW_SIZE) {
+        List<Scorer> all = new ArrayList<>(requiredScoring);
+        all.addAll(requiredNoScoring);
+        Scorer conjScorer = new ConjunctionScorer(all, Collections.emptyList());
+        DocIdSetIterator iterator = conjScorer.iterator();
+        TwoPhaseIterator twoPhase = TwoPhaseIterator.unwrap(iterator);
+        return twoPhase == null
+            ? new ConstantScoreBulkScorer(0f, scoreMode, iterator)
+            : new ConstantScoreBulkScorer(0f, scoreMode, twoPhase);
       } else if (requiredNoScoring.stream()
           .map(Scorer::twoPhaseIterator)
           .allMatch(Objects::isNull)) {
