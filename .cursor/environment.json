@@ -1,8 +1,4 @@
 {
   "name": "Apache Lucene",
-  "build": {
-    "dockerfile": "Dockerfile"
-  },
-  "user": "ubuntu",
   "install": "./.cursor/install.sh"
 }
