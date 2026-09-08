@@ -1,0 +1,105 @@
+Picked up JAVA_TOOL_OPTIONS: -Dhnsw.lazy.repair=thorough
+WARNING: Using incubator modules: jdk.incubator.vector
+HnswMergeResearch label=lazy-thorough datasets=RANDOM,SIFT vectorCounts=200000,512000 segs=2,5 deletes=0.0,0.2 modes=SMART_MERGE mergeIters=3 rebuildIters=1
+CACHE miss dataset=RANDOM vectorCount=200000 numSegments=2 — building segment graphs
+  building segment 1/2 size=120000
+Sep 08, 2026 10:40:23 AM org.apache.lucene.internal.vectorization.PanamaVectorizationProvider logIncubatorSetup
+INFO: Java vector incubator API enabled; uses preferredBitSize=512; FMA enabled
+  building segment 2/2 size=80000
+  iter 1/3 RANDOM SMART_MERGE n=200000 segs=2 del=0.0 wallMs=47319.54 dist=796363295
+  iter 2/3 RANDOM SMART_MERGE n=200000 segs=2 del=0.0 wallMs=50075.21 dist=796363295
+  iter 3/3 RANDOM SMART_MERGE n=200000 segs=2 del=0.0 wallMs=48910.46 dist=796363295
+RESULT label=lazy-thorough dataset=RANDOM mergeMode=SMART_MERGE vectorCount=200000 numSegments=2 deleteRatio=0.0 mergedSize=200000 wallMs=48768.40 distanceComputations=796363295 recall@100=0.2433 iters=3
+  iter 1/3 RANDOM SMART_MERGE n=200000 segs=2 del=0.2 wallMs=42789.94 dist=737074338
+  iter 2/3 RANDOM SMART_MERGE n=200000 segs=2 del=0.2 wallMs=42985.02 dist=737074338
+  iter 3/3 RANDOM SMART_MERGE n=200000 segs=2 del=0.2 wallMs=42130.68 dist=737074338
+RESULT label=lazy-thorough dataset=RANDOM mergeMode=SMART_MERGE vectorCount=200000 numSegments=2 deleteRatio=0.2 mergedSize=184081 wallMs=42635.21 distanceComputations=737074338 recall@100=0.2418 iters=3
+CACHE miss dataset=RANDOM vectorCount=200000 numSegments=5 — building segment graphs
+  building segment 1/5 size=120000
+  building segment 2/5 size=20000
+  building segment 3/5 size=20000
+  building segment 4/5 size=20000
+  building segment 5/5 size=20000
+  iter 1/3 RANDOM SMART_MERGE n=200000 segs=5 del=0.0 wallMs=49300.85 dist=803062811
+  iter 2/3 RANDOM SMART_MERGE n=200000 segs=5 del=0.0 wallMs=49635.05 dist=803062811
+  iter 3/3 RANDOM SMART_MERGE n=200000 segs=5 del=0.0 wallMs=49515.39 dist=803062811
+RESULT label=lazy-thorough dataset=RANDOM mergeMode=SMART_MERGE vectorCount=200000 numSegments=5 deleteRatio=0.0 mergedSize=200000 wallMs=49483.76 distanceComputations=803062811 recall@100=0.2393 iters=3
+  iter 1/3 RANDOM SMART_MERGE n=200000 segs=5 del=0.2 wallMs=42011.77 dist=737074338
+  iter 2/3 RANDOM SMART_MERGE n=200000 segs=5 del=0.2 wallMs=43353.29 dist=737074338
+  iter 3/3 RANDOM SMART_MERGE n=200000 segs=5 del=0.2 wallMs=43165.77 dist=737074338
+RESULT label=lazy-thorough dataset=RANDOM mergeMode=SMART_MERGE vectorCount=200000 numSegments=5 deleteRatio=0.2 mergedSize=184081 wallMs=42843.61 distanceComputations=737074338 recall@100=0.2418 iters=3
+CACHE miss dataset=RANDOM vectorCount=512000 numSegments=2 — building segment graphs
+  building segment 1/2 size=307200
+  building segment 2/2 size=204800
+  iter 1/3 RANDOM SMART_MERGE n=512000 segs=2 del=0.0 wallMs=155593.26 dist=2178203853
+  iter 2/3 RANDOM SMART_MERGE n=512000 segs=2 del=0.0 wallMs=151199.69 dist=2178203853
+  iter 3/3 RANDOM SMART_MERGE n=512000 segs=2 del=0.0 wallMs=154745.62 dist=2178203853
+RESULT label=lazy-thorough dataset=RANDOM mergeMode=SMART_MERGE vectorCount=512000 numSegments=2 deleteRatio=0.0 mergedSize=512000 wallMs=153846.19 distanceComputations=2178203853 recall@100=0.1565 iters=3
+  iter 1/3 RANDOM SMART_MERGE n=512000 segs=2 del=0.2 wallMs=136219.18 dist=2025764871
+  iter 2/3 RANDOM SMART_MERGE n=512000 segs=2 del=0.2 wallMs=138569.88 dist=2025764871
+  iter 3/3 RANDOM SMART_MERGE n=512000 segs=2 del=0.2 wallMs=142099.30 dist=2025764871
+RESULT label=lazy-thorough dataset=RANDOM mergeMode=SMART_MERGE vectorCount=512000 numSegments=2 deleteRatio=0.2 mergedSize=471107 wallMs=138962.79 distanceComputations=2025764871 recall@100=0.1594 iters=3
+CACHE miss dataset=RANDOM vectorCount=512000 numSegments=5 — building segment graphs
+  building segment 1/5 size=307200
+  building segment 2/5 size=51200
+  building segment 3/5 size=51200
+  building segment 4/5 size=51200
+  building segment 5/5 size=51200
+  iter 1/3 RANDOM SMART_MERGE n=512000 segs=5 del=0.0 wallMs=177427.67 dist=2194645058
+  iter 2/3 RANDOM SMART_MERGE n=512000 segs=5 del=0.0 wallMs=164426.58 dist=2194645058
+  iter 3/3 RANDOM SMART_MERGE n=512000 segs=5 del=0.0 wallMs=167205.98 dist=2194645058
+RESULT label=lazy-thorough dataset=RANDOM mergeMode=SMART_MERGE vectorCount=512000 numSegments=5 deleteRatio=0.0 mergedSize=512000 wallMs=169686.74 distanceComputations=2194645058 recall@100=0.1592 iters=3
+  iter 1/3 RANDOM SMART_MERGE n=512000 segs=5 del=0.2 wallMs=141153.59 dist=2025764871
+  iter 2/3 RANDOM SMART_MERGE n=512000 segs=5 del=0.2 wallMs=145418.72 dist=2025764871
+  iter 3/3 RANDOM SMART_MERGE n=512000 segs=5 del=0.2 wallMs=145803.66 dist=2025764871
+RESULT label=lazy-thorough dataset=RANDOM mergeMode=SMART_MERGE vectorCount=512000 numSegments=5 deleteRatio=0.2 mergedSize=471107 wallMs=144125.33 distanceComputations=2025764871 recall@100=0.1594 iters=3
+CACHE miss dataset=SIFT vectorCount=200000 numSegments=2 — building segment graphs
+  building segment 1/2 size=120000
+  building segment 2/2 size=80000
+  iter 1/3 SIFT SMART_MERGE n=200000 segs=2 del=0.0 wallMs=34551.40 dist=482484174
+  iter 2/3 SIFT SMART_MERGE n=200000 segs=2 del=0.0 wallMs=37296.90 dist=482484174
+  iter 3/3 SIFT SMART_MERGE n=200000 segs=2 del=0.0 wallMs=34587.75 dist=482484174
+RESULT label=lazy-thorough dataset=SIFT mergeMode=SMART_MERGE vectorCount=200000 numSegments=2 deleteRatio=0.0 mergedSize=200000 wallMs=35478.68 distanceComputations=482484174 recall@100=0.9424 iters=3
+  iter 1/3 SIFT SMART_MERGE n=200000 segs=2 del=0.2 wallMs=30711.64 dist=480238756
+  iter 2/3 SIFT SMART_MERGE n=200000 segs=2 del=0.2 wallMs=31403.19 dist=480238756
+  iter 3/3 SIFT SMART_MERGE n=200000 segs=2 del=0.2 wallMs=31243.95 dist=480238756
+RESULT label=lazy-thorough dataset=SIFT mergeMode=SMART_MERGE vectorCount=200000 numSegments=2 deleteRatio=0.2 mergedSize=184081 wallMs=31119.59 distanceComputations=480238756 recall@100=0.9014 iters=3
+CACHE miss dataset=SIFT vectorCount=200000 numSegments=5 — building segment graphs
+  building segment 1/5 size=120000
+  building segment 2/5 size=20000
+  building segment 3/5 size=20000
+  building segment 4/5 size=20000
+  building segment 5/5 size=20000
+  iter 1/3 SIFT SMART_MERGE n=200000 segs=5 del=0.0 wallMs=34702.16 dist=483972952
+  iter 2/3 SIFT SMART_MERGE n=200000 segs=5 del=0.0 wallMs=33560.89 dist=483972952
+  iter 3/3 SIFT SMART_MERGE n=200000 segs=5 del=0.0 wallMs=33710.53 dist=483972952
+RESULT label=lazy-thorough dataset=SIFT mergeMode=SMART_MERGE vectorCount=200000 numSegments=5 deleteRatio=0.0 mergedSize=200000 wallMs=33991.19 distanceComputations=483972952 recall@100=0.9281 iters=3
+  iter 1/3 SIFT SMART_MERGE n=200000 segs=5 del=0.2 wallMs=32548.16 dist=480238756
+  iter 2/3 SIFT SMART_MERGE n=200000 segs=5 del=0.2 wallMs=32864.96 dist=480238756
+  iter 3/3 SIFT SMART_MERGE n=200000 segs=5 del=0.2 wallMs=33755.39 dist=480238756
+RESULT label=lazy-thorough dataset=SIFT mergeMode=SMART_MERGE vectorCount=200000 numSegments=5 deleteRatio=0.2 mergedSize=184081 wallMs=33056.17 distanceComputations=480238756 recall@100=0.9014 iters=3
+CACHE miss dataset=SIFT vectorCount=512000 numSegments=2 — building segment graphs
+  building segment 1/2 size=307200
+  building segment 2/2 size=204800
+  iter 1/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 wallMs=107452.27 dist=1282298027
+  iter 2/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 wallMs=107977.46 dist=1282298027
+  iter 3/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 wallMs=107486.01 dist=1282298027
+RESULT label=lazy-thorough dataset=SIFT mergeMode=SMART_MERGE vectorCount=512000 numSegments=2 deleteRatio=0.0 mergedSize=512000 wallMs=107638.58 distanceComputations=1282298027 recall@100=0.9194 iters=3
+  iter 1/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 wallMs=103599.43 dist=1274618388
+  iter 2/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 wallMs=106780.15 dist=1274618388
+  iter 3/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 wallMs=108907.72 dist=1274618388
+RESULT label=lazy-thorough dataset=SIFT mergeMode=SMART_MERGE vectorCount=512000 numSegments=2 deleteRatio=0.2 mergedSize=471107 wallMs=106429.10 distanceComputations=1274618388 recall@100=0.8583 iters=3
+CACHE miss dataset=SIFT vectorCount=512000 numSegments=5 — building segment graphs
+  building segment 1/5 size=307200
+  building segment 2/5 size=51200
+  building segment 3/5 size=51200
+  building segment 4/5 size=51200
+  building segment 5/5 size=51200
+  iter 1/3 SIFT SMART_MERGE n=512000 segs=5 del=0.0 wallMs=104769.21 dist=1284508088
+  iter 2/3 SIFT SMART_MERGE n=512000 segs=5 del=0.0 wallMs=103962.24 dist=1284508088
+  iter 3/3 SIFT SMART_MERGE n=512000 segs=5 del=0.0 wallMs=116633.50 dist=1284508088
+RESULT label=lazy-thorough dataset=SIFT mergeMode=SMART_MERGE vectorCount=512000 numSegments=5 deleteRatio=0.0 mergedSize=512000 wallMs=108454.98 distanceComputations=1284508088 recall@100=0.9054 iters=3
+  iter 1/3 SIFT SMART_MERGE n=512000 segs=5 del=0.2 wallMs=99883.32 dist=1274618388
+  iter 2/3 SIFT SMART_MERGE n=512000 segs=5 del=0.2 wallMs=98847.49 dist=1274618388
+  iter 3/3 SIFT SMART_MERGE n=512000 segs=5 del=0.2 wallMs=97560.41 dist=1274618388
+RESULT label=lazy-thorough dataset=SIFT mergeMode=SMART_MERGE vectorCount=512000 numSegments=5 deleteRatio=0.2 mergedSize=471107 wallMs=98763.74 distanceComputations=1274618388 recall@100=0.8583 iters=3

@@ -1,0 +1,87 @@
+WARNING: Using incubator modules: jdk.incubator.vector
+HnswMergeResearch label=combined-par-sift512k datasets=SIFT vectorCounts=512000 segs=2 deletes=0.0,0.2 modes=SMART_MERGE,COMBINED beamWidths=100 numWorkers=1,2,4,8 warmup=1 mergeIters=3 rebuildIters=3
+CACHE miss dataset=SIFT vectorCount=512000 numSegments=2 — building segment graphs
+  building segment 1/2 size=307200
+Sep 08, 2026 1:51:57 PM org.apache.lucene.internal.vectorization.PanamaVectorizationProvider logIncubatorSetup
+INFO: Java vector incubator API enabled; uses preferredBitSize=512; FMA enabled
+  building segment 2/2 size=204800
+  warmup 1/1 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=100 workers=1 dist=476420383
+  iter 1/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=100 workers=1 wallMs=44091.38 dist=476420383
+  iter 2/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=100 workers=1 wallMs=46584.11 dist=476420383
+  iter 3/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=100 workers=1 wallMs=44873.20 dist=476420383
+RESULT label=combined-par-sift512k dataset=SIFT mergeMode=SMART_MERGE vectorCount=512000 numSegments=2 deleteRatio=0.0 mergedSize=512000 wallMs=45182.90 distanceComputations=476420383 recall@100=0.9447 mdr=1.0014 epsRecall@100=0.9985 iters=3 beamWidth=100 numWorkers=1 buildMs=44532.73 writeLockWaitMs=103.147 writeLockCount=2751099 incomingWaitMs=0.000 incomingCount=0 effectiveConcurrency=1.000 workerThreads=1 blockedPct=0.00 runnableSamples=2170 blockedSamples=0
+  warmup 1/1 SIFT COMBINED n=512000 segs=2 del=0.0 beam=100 workers=1 dist=1177420892
+  iter 1/3 SIFT COMBINED n=512000 segs=2 del=0.0 beam=100 workers=1 wallMs=119801.89 dist=1177420892
+  iter 2/3 SIFT COMBINED n=512000 segs=2 del=0.0 beam=100 workers=1 wallMs=112277.88 dist=1177420892
+  iter 3/3 SIFT COMBINED n=512000 segs=2 del=0.0 beam=100 workers=1 wallMs=115575.31 dist=1177420892
+RESULT label=combined-par-sift512k dataset=SIFT mergeMode=COMBINED vectorCount=512000 numSegments=2 deleteRatio=0.0 mergedSize=512000 wallMs=115885.03 distanceComputations=1177420892 recall@100=0.8591 mdr=1.0025 epsRecall@100=0.9970 iters=3 beamWidth=100 numWorkers=1 buildMs=115445.76 writeLockWaitMs=0.000 writeLockCount=0 incomingWaitMs=233.135 incomingCount=3026740 effectiveConcurrency=1.000 workerThreads=1 blockedPct=0.00 runnableSamples=5619 blockedSamples=0
+  warmup 1/1 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=100 workers=2 dist=476885807
+  iter 1/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=100 workers=2 wallMs=22056.91 dist=476877873
+  iter 2/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=100 workers=2 wallMs=22339.39 dist=476907671
+  iter 3/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=100 workers=2 wallMs=22314.54 dist=476871569
+RESULT label=combined-par-sift512k dataset=SIFT mergeMode=SMART_MERGE vectorCount=512000 numSegments=2 deleteRatio=0.0 mergedSize=512000 wallMs=22236.94 distanceComputations=476877873 recall@100=0.9462 mdr=1.0014 epsRecall@100=0.9989 iters=3 beamWidth=100 numWorkers=2 buildMs=22182.57 writeLockWaitMs=144.823 writeLockCount=2756389 incomingWaitMs=0.000 incomingCount=0 effectiveConcurrency=1.995 workerThreads=2 blockedPct=0.00 runnableSamples=2148 blockedSamples=0
+  warmup 1/1 SIFT COMBINED n=512000 segs=2 del=0.0 beam=100 workers=2 dist=1177776469
+  iter 1/3 SIFT COMBINED n=512000 segs=2 del=0.0 beam=100 workers=2 wallMs=60100.43 dist=1177752139
+  iter 2/3 SIFT COMBINED n=512000 segs=2 del=0.0 beam=100 workers=2 wallMs=58254.41 dist=1177766793
+  iter 3/3 SIFT COMBINED n=512000 segs=2 del=0.0 beam=100 workers=2 wallMs=59025.23 dist=1177781764
+RESULT label=combined-par-sift512k dataset=SIFT mergeMode=COMBINED vectorCount=512000 numSegments=2 deleteRatio=0.0 mergedSize=512000 wallMs=59126.69 distanceComputations=1177752139 recall@100=0.8588 mdr=1.0025 epsRecall@100=0.9971 iters=3 beamWidth=100 numWorkers=2 buildMs=58884.45 writeLockWaitMs=0.000 writeLockCount=0 incomingWaitMs=264.718 incomingCount=3030783 effectiveConcurrency=1.985 workerThreads=3 blockedPct=0.00 runnableSamples=5680 blockedSamples=0
+  warmup 1/1 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=100 workers=4 dist=477361344
+  iter 1/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=100 workers=4 wallMs=11308.03 dist=477385369
+  iter 2/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=100 workers=4 wallMs=11422.09 dist=477375259
+  iter 3/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=100 workers=4 wallMs=11781.59 dist=477367561
+RESULT label=combined-par-sift512k dataset=SIFT mergeMode=SMART_MERGE vectorCount=512000 numSegments=2 deleteRatio=0.0 mergedSize=512000 wallMs=11503.90 distanceComputations=477385369 recall@100=0.9454 mdr=1.0014 epsRecall@100=0.9993 iters=3 beamWidth=100 numWorkers=4 buildMs=11633.37 writeLockWaitMs=181.647 writeLockCount=2759932 incomingWaitMs=0.000 incomingCount=0 effectiveConcurrency=3.952 workerThreads=4 blockedPct=0.00 runnableSamples=2216 blockedSamples=0
+  warmup 1/1 SIFT COMBINED n=512000 segs=2 del=0.0 beam=100 workers=4 dist=1177936835
+  iter 1/3 SIFT COMBINED n=512000 segs=2 del=0.0 beam=100 workers=4 wallMs=37632.82 dist=1177929733
+  iter 2/3 SIFT COMBINED n=512000 segs=2 del=0.0 beam=100 workers=4 wallMs=30985.14 dist=1177927864
+  iter 3/3 SIFT COMBINED n=512000 segs=2 del=0.0 beam=100 workers=4 wallMs=31709.16 dist=1177953451
+RESULT label=combined-par-sift512k dataset=SIFT mergeMode=COMBINED vectorCount=512000 numSegments=2 deleteRatio=0.0 mergedSize=512000 wallMs=33442.37 distanceComputations=1177929733 recall@100=0.8588 mdr=1.0025 epsRecall@100=0.9971 iters=3 beamWidth=100 numWorkers=4 buildMs=31582.63 writeLockWaitMs=0.000 writeLockCount=0 incomingWaitMs=305.056 incomingCount=3033891 effectiveConcurrency=3.962 workerThreads=5 blockedPct=0.00 runnableSamples=6059 blockedSamples=0
+  warmup 1/1 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=100 workers=8 dist=477457884
+  iter 1/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=100 workers=8 wallMs=6862.42 dist=477423645
+  iter 2/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=100 workers=8 wallMs=6787.83 dist=477411423
+  iter 3/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=100 workers=8 wallMs=7053.43 dist=477461107
+RESULT label=combined-par-sift512k dataset=SIFT mergeMode=SMART_MERGE vectorCount=512000 numSegments=2 deleteRatio=0.0 mergedSize=512000 wallMs=6901.22 distanceComputations=477423645 recall@100=0.9439 mdr=1.0014 epsRecall@100=0.9993 iters=3 beamWidth=100 numWorkers=8 buildMs=6909.71 writeLockWaitMs=362.477 writeLockCount=2761444 incomingWaitMs=0.000 incomingCount=0 effectiveConcurrency=7.725 workerThreads=8 blockedPct=0.00 runnableSamples=2246 blockedSamples=0
+  warmup 1/1 SIFT COMBINED n=512000 segs=2 del=0.0 beam=100 workers=8 dist=1178034887
+  iter 1/3 SIFT COMBINED n=512000 segs=2 del=0.0 beam=100 workers=8 wallMs=24993.49 dist=1178052671
+  iter 2/3 SIFT COMBINED n=512000 segs=2 del=0.0 beam=100 workers=8 wallMs=26296.91 dist=1178044501
+  iter 3/3 SIFT COMBINED n=512000 segs=2 del=0.0 beam=100 workers=8 wallMs=25329.04 dist=1178046110
+RESULT label=combined-par-sift512k dataset=SIFT mergeMode=COMBINED vectorCount=512000 numSegments=2 deleteRatio=0.0 mergedSize=512000 wallMs=25539.81 distanceComputations=1178052671 recall@100=0.8587 mdr=1.0026 epsRecall@100=0.9971 iters=3 beamWidth=100 numWorkers=8 buildMs=25131.50 writeLockWaitMs=0.000 writeLockCount=0 incomingWaitMs=694.413 incomingCount=3036426 effectiveConcurrency=7.833 workerThreads=9 blockedPct=0.16 runnableSamples=8107 blockedSamples=13
+  warmup 1/1 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=100 workers=1 dist=381583074
+  iter 1/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=100 workers=1 wallMs=35896.39 dist=381583074
+  iter 2/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=100 workers=1 wallMs=35272.19 dist=381583074
+  iter 3/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=100 workers=1 wallMs=35675.32 dist=381583074
+RESULT label=combined-par-sift512k dataset=SIFT mergeMode=SMART_MERGE vectorCount=512000 numSegments=2 deleteRatio=0.2 mergedSize=471107 wallMs=35614.63 distanceComputations=381583074 recall@100=0.9466 mdr=1.0013 epsRecall@100=0.9987 iters=3 beamWidth=100 numWorkers=1 buildMs=35394.71 writeLockWaitMs=85.265 writeLockCount=2208905 incomingWaitMs=0.000 incomingCount=0 effectiveConcurrency=1.000 workerThreads=1 blockedPct=0.00 runnableSamples=1726 blockedSamples=0
+  warmup 1/1 SIFT COMBINED n=512000 segs=2 del=0.2 beam=100 workers=1 dist=435867528
+  iter 1/3 SIFT COMBINED n=512000 segs=2 del=0.2 beam=100 workers=1 wallMs=35268.57 dist=435867528
+  iter 2/3 SIFT COMBINED n=512000 segs=2 del=0.2 beam=100 workers=1 wallMs=34520.87 dist=435867528
+  iter 3/3 SIFT COMBINED n=512000 segs=2 del=0.2 beam=100 workers=1 wallMs=35208.34 dist=435867528
+RESULT label=combined-par-sift512k dataset=SIFT mergeMode=COMBINED vectorCount=512000 numSegments=2 deleteRatio=0.2 mergedSize=471107 wallMs=34999.26 distanceComputations=435867528 recall@100=0.7840 mdr=1.0065 epsRecall@100=0.9682 iters=3 beamWidth=100 numWorkers=1 buildMs=35034.00 writeLockWaitMs=0.000 writeLockCount=0 incomingWaitMs=143.150 incomingCount=2060965 effectiveConcurrency=1.000 workerThreads=1 blockedPct=0.00 runnableSamples=1704 blockedSamples=0
+  warmup 1/1 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=100 workers=2 dist=381793404
+  iter 1/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=100 workers=2 wallMs=17709.19 dist=381821266
+  iter 2/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=100 workers=2 wallMs=17384.72 dist=381791676
+  iter 3/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=100 workers=2 wallMs=18629.64 dist=381796473
+RESULT label=combined-par-sift512k dataset=SIFT mergeMode=SMART_MERGE vectorCount=512000 numSegments=2 deleteRatio=0.2 mergedSize=471107 wallMs=17907.85 distanceComputations=381821266 recall@100=0.9461 mdr=1.0014 epsRecall@100=0.9988 iters=3 beamWidth=100 numWorkers=2 buildMs=18485.44 writeLockWaitMs=116.046 writeLockCount=2210399 incomingWaitMs=0.000 incomingCount=0 effectiveConcurrency=1.986 workerThreads=2 blockedPct=0.00 runnableSamples=1787 blockedSamples=0
+  warmup 1/1 SIFT COMBINED n=512000 segs=2 del=0.2 beam=100 workers=2 dist=435758934
+  iter 1/3 SIFT COMBINED n=512000 segs=2 del=0.2 beam=100 workers=2 wallMs=17681.51 dist=435741762
+  iter 2/3 SIFT COMBINED n=512000 segs=2 del=0.2 beam=100 workers=2 wallMs=18243.14 dist=435741762
+  iter 3/3 SIFT COMBINED n=512000 segs=2 del=0.2 beam=100 workers=2 wallMs=17505.21 dist=435759094
+RESULT label=combined-par-sift512k dataset=SIFT mergeMode=COMBINED vectorCount=512000 numSegments=2 deleteRatio=0.2 mergedSize=471107 wallMs=17809.95 distanceComputations=435741762 recall@100=0.7830 mdr=1.0065 epsRecall@100=0.9671 iters=3 beamWidth=100 numWorkers=2 buildMs=17379.75 writeLockWaitMs=0.000 writeLockCount=0 incomingWaitMs=170.473 incomingCount=2061021 effectiveConcurrency=1.979 workerThreads=3 blockedPct=0.00 runnableSamples=1673 blockedSamples=0
+  warmup 1/1 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=100 workers=4 dist=381839203
+  iter 1/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=100 workers=4 wallMs=17223.14 dist=381859352
+  iter 2/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=100 workers=4 wallMs=18294.19 dist=381865526
+  iter 3/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=100 workers=4 wallMs=16825.76 dist=381855655
+RESULT label=combined-par-sift512k dataset=SIFT mergeMode=SMART_MERGE vectorCount=512000 numSegments=2 deleteRatio=0.2 mergedSize=471107 wallMs=17447.70 distanceComputations=381859352 recall@100=0.9470 mdr=1.0013 epsRecall@100=0.9988 iters=3 beamWidth=100 numWorkers=4 buildMs=16567.25 writeLockWaitMs=193.619 writeLockCount=2211698 incomingWaitMs=0.000 incomingCount=0 effectiveConcurrency=3.964 workerThreads=4 blockedPct=0.00 runnableSamples=3179 blockedSamples=0
+  warmup 1/1 SIFT COMBINED n=512000 segs=2 del=0.2 beam=100 workers=4 dist=435737244
+  iter 1/3 SIFT COMBINED n=512000 segs=2 del=0.2 beam=100 workers=4 wallMs=10546.00 dist=435732821
+  iter 2/3 SIFT COMBINED n=512000 segs=2 del=0.2 beam=100 workers=4 wallMs=10746.58 dist=435736236
+  iter 3/3 SIFT COMBINED n=512000 segs=2 del=0.2 beam=100 workers=4 wallMs=10075.00 dist=435733155
+RESULT label=combined-par-sift512k dataset=SIFT mergeMode=COMBINED vectorCount=512000 numSegments=2 deleteRatio=0.2 mergedSize=471107 wallMs=10455.86 distanceComputations=435732821 recall@100=0.7829 mdr=1.0065 epsRecall@100=0.9670 iters=3 beamWidth=100 numWorkers=4 buildMs=9945.26 writeLockWaitMs=0.000 writeLockCount=0 incomingWaitMs=405.352 incomingCount=2061025 effectiveConcurrency=3.936 workerThreads=5 blockedPct=0.00 runnableSamples=1904 blockedSamples=0
+  warmup 1/1 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=100 workers=8 dist=382014413
+  iter 1/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=100 workers=8 wallMs=17670.35 dist=381988120
+  iter 2/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=100 workers=8 wallMs=14229.73 dist=381999536
+  iter 3/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=100 workers=8 wallMs=5921.80 dist=382025660
+RESULT label=combined-par-sift512k dataset=SIFT mergeMode=SMART_MERGE vectorCount=512000 numSegments=2 deleteRatio=0.2 mergedSize=471107 wallMs=12607.29 distanceComputations=381988120 recall@100=0.9475 mdr=1.0014 epsRecall@100=0.9987 iters=3 beamWidth=100 numWorkers=8 buildMs=5689.96 writeLockWaitMs=311.665 writeLockCount=2212754 incomingWaitMs=0.000 incomingCount=0 effectiveConcurrency=7.726 workerThreads=8 blockedPct=0.00 runnableSamples=1877 blockedSamples=0
+  warmup 1/1 SIFT COMBINED n=512000 segs=2 del=0.2 beam=100 workers=8 dist=435669056
+  iter 1/3 SIFT COMBINED n=512000 segs=2 del=0.2 beam=100 workers=8 wallMs=18681.21 dist=435655841
+  iter 2/3 SIFT COMBINED n=512000 segs=2 del=0.2 beam=100 workers=8 wallMs=18963.10 dist=435662260
+  iter 3/3 SIFT COMBINED n=512000 segs=2 del=0.2 beam=100 workers=8 wallMs=18045.75 dist=435666349
+RESULT label=combined-par-sift512k dataset=SIFT mergeMode=COMBINED vectorCount=512000 numSegments=2 deleteRatio=0.2 mergedSize=471107 wallMs=18563.35 distanceComputations=435655841 recall@100=0.7829 mdr=1.0065 epsRecall@100=0.9670 iters=3 beamWidth=100 numWorkers=8 buildMs=17860.22 writeLockWaitMs=0.000 writeLockCount=0 incomingWaitMs=453.166 incomingCount=2061035 effectiveConcurrency=7.848 workerThreads=9 blockedPct=0.00 runnableSamples=5860 blockedSamples=0

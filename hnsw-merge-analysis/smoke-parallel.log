@@ -1,0 +1,32 @@
+WARNING: Using incubator modules: jdk.incubator.vector
+HnswMergeResearch label=smoke-parallel datasets=SIFT vectorCounts=20000 segs=2 deletes=0.0 modes=SMART_MERGE,COMBINED beamWidths=100 numWorkers=1,2 warmup=0 mergeIters=1 rebuildIters=1
+CACHE miss dataset=SIFT vectorCount=20000 numSegments=2 — building segment graphs
+  building segment 1/2 size=12000
+Sep 08, 2026 12:45:52 PM org.apache.lucene.internal.vectorization.PanamaVectorizationProvider logIncubatorSetup
+INFO: Java vector incubator API enabled; uses preferredBitSize=512; FMA enabled
+  building segment 2/2 size=8000
+  iter 1/1 SIFT SMART_MERGE n=20000 segs=2 del=0.0 beam=100 workers=1 wallMs=977.47 dist=13899172
+RESULT label=smoke-parallel dataset=SIFT mergeMode=SMART_MERGE vectorCount=20000 numSegments=2 deleteRatio=0.0 mergedSize=20000 wallMs=977.47 distanceComputations=13899172 recall@100=0.9897 mdr=1.0002 epsRecall@100=1.0000 iters=1 beamWidth=100 numWorkers=1 buildMs=961.22 writeLockWaitMs=4.164 writeLockCount=97391 incomingWaitMs=0.000 incomingCount=0 effectiveConcurrency=0.998 workerThreads=1 blockedPct=0.00 runnableSamples=47 blockedSamples=0
+  iter 1/1 SIFT COMBINED n=20000 segs=2 del=0.0 beam=100 workers=1 wallMs=2608.03 dist=34876446
+RESULT label=smoke-parallel dataset=SIFT mergeMode=COMBINED vectorCount=20000 numSegments=2 deleteRatio=0.0 mergedSize=20000 wallMs=2608.03 distanceComputations=34876446 recall@100=0.9735 mdr=1.0006 epsRecall@100=1.0000 iters=1 beamWidth=100 numWorkers=1 buildMs=2595.39 writeLockWaitMs=0.000 writeLockCount=0 incomingWaitMs=7.285 incomingCount=105439 effectiveConcurrency=0.805 workerThreads=1 blockedPct=0.00 runnableSamples=127 blockedSamples=0
+  iter 1/1 SIFT SMART_MERGE n=20000 segs=2 del=0.0 beam=100 workers=2 wallMs=548.69 dist=13850784
+RESULT label=smoke-parallel dataset=SIFT mergeMode=SMART_MERGE vectorCount=20000 numSegments=2 deleteRatio=0.0 mergedSize=20000 wallMs=548.69 distanceComputations=13850784 recall@100=0.9886 mdr=1.0003 epsRecall@100=1.0000 iters=1 beamWidth=100 numWorkers=2 buildMs=531.33 writeLockWaitMs=5.039 writeLockCount=97235 incomingWaitMs=0.000 incomingCount=0 effectiveConcurrency=1.932 workerThreads=2 blockedPct=0.00 runnableSamples=50 blockedSamples=0
+Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: Index 32 out of bounds for length 32
+	at org.apache.lucene.util.hnsw.HnswGraphSearcher.searchLevel(HnswGraphSearcher.java:336)
+	at org.apache.lucene.util.hnsw.CombinedHnswGraphBuilder.searchSourceGraph(CombinedHnswGraphBuilder.java:273)
+	at org.apache.lucene.util.hnsw.CombinedHnswGraphBuilder.augmentLevel0Candidates(CombinedHnswGraphBuilder.java:239)
+	at org.apache.lucene.util.hnsw.HnswGraphBuilder.addGraphNodeInternal(HnswGraphBuilder.java:343)
+	at org.apache.lucene.util.hnsw.HnswGraphBuilder.addGraphNode(HnswGraphBuilder.java:383)
+	at org.apache.lucene.util.hnsw.CombinedConcurrentHnswGraphBuilder$Worker.addGraphNode(CombinedConcurrentHnswGraphBuilder.java:317)
+	at org.apache.lucene.util.hnsw.HnswGraphBuilder.addVectors(HnswGraphBuilder.java:243)
+	at org.apache.lucene.util.hnsw.CombinedConcurrentHnswGraphBuilder$Worker.runInsert(CombinedConcurrentHnswGraphBuilder.java:292)
+	at org.apache.lucene.util.hnsw.CombinedConcurrentHnswGraphBuilder.lambda$build$0(CombinedConcurrentHnswGraphBuilder.java:138)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at org.apache.lucene.search.TaskExecutor$Task.run(TaskExecutor.java:171)
+	at org.apache.lucene.search.TaskExecutor.invokeAll(TaskExecutor.java:109)
+	at org.apache.lucene.util.hnsw.CombinedConcurrentHnswGraphBuilder.build(CombinedConcurrentHnswGraphBuilder.java:142)
+	at org.apache.lucene.benchmark.jmh.HnswMergeBenchmark.runConcurrent(HnswMergeBenchmark.java:386)
+	at org.apache.lucene.benchmark.jmh.HnswMergeBenchmark.runConcurrentCombined(HnswMergeBenchmark.java:342)
+	at org.apache.lucene.benchmark.jmh.HnswMergeResearch.run(HnswMergeResearch.java:279)
+	at org.apache.lucene.benchmark.jmh.HnswMergeResearch.measure(HnswMergeResearch.java:168)
+	at org.apache.lucene.benchmark.jmh.HnswMergeResearch.main(HnswMergeResearch.java:110)

@@ -1,0 +1,30 @@
+WARNING: Using incubator modules: jdk.incubator.vector
+HnswMergeResearch label=quality-mdr datasets=RANDOM,SIFT vectorCounts=200000 segs=2,5 deletes=0.0 modes=SMART_MERGE mergeIters=1 rebuildIters=1
+CACHE miss dataset=RANDOM vectorCount=200000 numSegments=2 — building segment graphs
+  building segment 1/2 size=120000
+Sep 08, 2026 12:12:05 PM org.apache.lucene.internal.vectorization.PanamaVectorizationProvider logIncubatorSetup
+INFO: Java vector incubator API enabled; uses preferredBitSize=512; FMA enabled
+  building segment 2/2 size=80000
+  iter 1/1 RANDOM SMART_MERGE n=200000 segs=2 del=0.0 wallMs=21583.55 dist=309213388
+RESULT label=quality-mdr dataset=RANDOM mergeMode=SMART_MERGE vectorCount=200000 numSegments=2 deleteRatio=0.0 mergedSize=200000 wallMs=21583.55 distanceComputations=309213388 recall@100=0.2784 mdr=1.0238 epsRecall@100=0.4377 iters=1
+CACHE miss dataset=RANDOM vectorCount=200000 numSegments=5 — building segment graphs
+  building segment 1/5 size=120000
+  building segment 2/5 size=20000
+  building segment 3/5 size=20000
+  building segment 4/5 size=20000
+  building segment 5/5 size=20000
+  iter 1/1 RANDOM SMART_MERGE n=200000 segs=5 del=0.0 wallMs=20768.99 dist=296323984
+RESULT label=quality-mdr dataset=RANDOM mergeMode=SMART_MERGE vectorCount=200000 numSegments=5 deleteRatio=0.0 mergedSize=200000 wallMs=20768.99 distanceComputations=296323984 recall@100=0.2747 mdr=1.0239 epsRecall@100=0.4362 iters=1
+CACHE miss dataset=SIFT vectorCount=200000 numSegments=2 — building segment graphs
+  building segment 1/2 size=120000
+  building segment 2/2 size=80000
+  iter 1/1 SIFT SMART_MERGE n=200000 segs=2 del=0.0 wallMs=10577.88 dist=114938654
+RESULT label=quality-mdr dataset=SIFT mergeMode=SMART_MERGE vectorCount=200000 numSegments=2 deleteRatio=0.0 mergedSize=200000 wallMs=10577.88 distanceComputations=114938654 recall@100=0.9569 mdr=1.0011 epsRecall@100=0.9992 iters=1
+CACHE miss dataset=SIFT vectorCount=200000 numSegments=5 — building segment graphs
+  building segment 1/5 size=120000
+  building segment 2/5 size=20000
+  building segment 3/5 size=20000
+  building segment 4/5 size=20000
+  building segment 5/5 size=20000
+  iter 1/1 SIFT SMART_MERGE n=200000 segs=5 del=0.0 wallMs=10041.15 dist=114228237
+RESULT label=quality-mdr dataset=SIFT mergeMode=SMART_MERGE vectorCount=200000 numSegments=5 deleteRatio=0.0 mergedSize=200000 wallMs=10041.15 distanceComputations=114228237 recall@100=0.9542 mdr=1.0011 epsRecall@100=0.9991 iters=1

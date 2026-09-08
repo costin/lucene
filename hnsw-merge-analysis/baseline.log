@@ -1,0 +1,152 @@
+WARNING: Using incubator modules: jdk.incubator.vector
+HnswMergeResearch label=baseline datasets=RANDOM,SIFT vectorCounts=200000,512000 segs=2,5 deletes=0.0,0.2 modes=FULL_REBUILD,SMART_MERGE mergeIters=3 rebuildIters=2
+CACHE miss dataset=RANDOM vectorCount=200000 numSegments=2 — building segment graphs
+  building segment 1/2 size=120000
+Sep 08, 2026 7:26:49 AM org.apache.lucene.internal.vectorization.PanamaVectorizationProvider logIncubatorSetup
+INFO: Java vector incubator API enabled; uses preferredBitSize=512; FMA enabled
+  building segment 2/2 size=80000
+  iter 1/2 RANDOM FULL_REBUILD n=200000 segs=2 del=0.0 wallMs=52525.14 dist=907412700
+  iter 2/2 RANDOM FULL_REBUILD n=200000 segs=2 del=0.0 wallMs=54600.77 dist=907412700
+RESULT label=baseline dataset=RANDOM mergeMode=FULL_REBUILD vectorCount=200000 numSegments=2 deleteRatio=0.0 mergedSize=200000 wallMs=53562.95 distanceComputations=907412700 recall@100=0.2787 iters=2
+  iter 1/3 RANDOM SMART_MERGE n=200000 segs=2 del=0.0 wallMs=21837.22 dist=309213388
+  iter 2/3 RANDOM SMART_MERGE n=200000 segs=2 del=0.0 wallMs=21118.14 dist=309213388
+  iter 3/3 RANDOM SMART_MERGE n=200000 segs=2 del=0.0 wallMs=20774.65 dist=309213388
+RESULT label=baseline dataset=RANDOM mergeMode=SMART_MERGE vectorCount=200000 numSegments=2 deleteRatio=0.0 mergedSize=200000 wallMs=21243.34 distanceComputations=309213388 recall@100=0.2784 iters=3
+  iter 1/2 RANDOM FULL_REBUILD n=200000 segs=2 del=0.2 wallMs=49168.54 dist=830802250
+  iter 2/2 RANDOM FULL_REBUILD n=200000 segs=2 del=0.2 wallMs=48751.50 dist=830802250
+RESULT label=baseline dataset=RANDOM mergeMode=FULL_REBUILD vectorCount=200000 numSegments=2 deleteRatio=0.2 mergedSize=184081 wallMs=48960.02 distanceComputations=830802250 recall@100=0.2914 iters=2
+  iter 1/3 RANDOM SMART_MERGE n=200000 segs=2 del=0.2 wallMs=21542.39 dist=318120734
+  iter 2/3 RANDOM SMART_MERGE n=200000 segs=2 del=0.2 wallMs=20040.87 dist=318120734
+  iter 3/3 RANDOM SMART_MERGE n=200000 segs=2 del=0.2 wallMs=20542.56 dist=318120734
+RESULT label=baseline dataset=RANDOM mergeMode=SMART_MERGE vectorCount=200000 numSegments=2 deleteRatio=0.2 mergedSize=184081 wallMs=20708.61 distanceComputations=318120734 recall@100=0.2910 iters=3
+CACHE miss dataset=RANDOM vectorCount=200000 numSegments=5 — building segment graphs
+  building segment 1/5 size=120000
+  building segment 2/5 size=20000
+  building segment 3/5 size=20000
+  building segment 4/5 size=20000
+  building segment 5/5 size=20000
+  iter 1/2 RANDOM FULL_REBUILD n=200000 segs=5 del=0.0 wallMs=55536.90 dist=907412700
+  iter 2/2 RANDOM FULL_REBUILD n=200000 segs=5 del=0.0 wallMs=55808.61 dist=907412700
+RESULT label=baseline dataset=RANDOM mergeMode=FULL_REBUILD vectorCount=200000 numSegments=5 deleteRatio=0.0 mergedSize=200000 wallMs=55672.76 distanceComputations=907412700 recall@100=0.2787 iters=2
+  iter 1/3 RANDOM SMART_MERGE n=200000 segs=5 del=0.0 wallMs=20018.91 dist=296323984
+  iter 2/3 RANDOM SMART_MERGE n=200000 segs=5 del=0.0 wallMs=20109.38 dist=296323984
+  iter 3/3 RANDOM SMART_MERGE n=200000 segs=5 del=0.0 wallMs=19733.54 dist=296323984
+RESULT label=baseline dataset=RANDOM mergeMode=SMART_MERGE vectorCount=200000 numSegments=5 deleteRatio=0.0 mergedSize=200000 wallMs=19953.94 distanceComputations=296323984 recall@100=0.2747 iters=3
+  iter 1/2 RANDOM FULL_REBUILD n=200000 segs=5 del=0.2 wallMs=48889.02 dist=830802250
+  iter 2/2 RANDOM FULL_REBUILD n=200000 segs=5 del=0.2 wallMs=50861.08 dist=830802250
+RESULT label=baseline dataset=RANDOM mergeMode=FULL_REBUILD vectorCount=200000 numSegments=5 deleteRatio=0.2 mergedSize=184081 wallMs=49875.05 distanceComputations=830802250 recall@100=0.2914 iters=2
+  iter 1/3 RANDOM SMART_MERGE n=200000 segs=5 del=0.2 wallMs=20995.73 dist=318120734
+  iter 2/3 RANDOM SMART_MERGE n=200000 segs=5 del=0.2 wallMs=20549.13 dist=318120734
+  iter 3/3 RANDOM SMART_MERGE n=200000 segs=5 del=0.2 wallMs=20285.68 dist=318120734
+RESULT label=baseline dataset=RANDOM mergeMode=SMART_MERGE vectorCount=200000 numSegments=5 deleteRatio=0.2 mergedSize=184081 wallMs=20610.18 distanceComputations=318120734 recall@100=0.2910 iters=3
+CACHE miss dataset=RANDOM vectorCount=512000 numSegments=2 — building segment graphs
+  building segment 1/2 size=307200
+  building segment 2/2 size=204800
+  iter 1/2 RANDOM FULL_REBUILD n=512000 segs=2 del=0.0 wallMs=198791.64 dist=2439514737
+  iter 2/2 RANDOM FULL_REBUILD n=512000 segs=2 del=0.0 wallMs=180533.52 dist=2439514737
+RESULT label=baseline dataset=RANDOM mergeMode=FULL_REBUILD vectorCount=512000 numSegments=2 deleteRatio=0.0 mergedSize=512000 wallMs=189662.58 distanceComputations=2439514737 recall@100=0.1791 iters=2
+  iter 1/3 RANDOM SMART_MERGE n=512000 segs=2 del=0.0 wallMs=67849.82 dist=819847844
+  iter 2/3 RANDOM SMART_MERGE n=512000 segs=2 del=0.0 wallMs=68318.17 dist=819847844
+  iter 3/3 RANDOM SMART_MERGE n=512000 segs=2 del=0.0 wallMs=66350.60 dist=819847844
+RESULT label=baseline dataset=RANDOM mergeMode=SMART_MERGE vectorCount=512000 numSegments=2 deleteRatio=0.0 mergedSize=512000 wallMs=67506.19 distanceComputations=819847844 recall@100=0.1788 iters=3
+  iter 1/2 RANDOM FULL_REBUILD n=512000 segs=2 del=0.2 wallMs=151418.30 dist=2236629296
+  iter 2/2 RANDOM FULL_REBUILD n=512000 segs=2 del=0.2 wallMs=150892.21 dist=2236629296
+RESULT label=baseline dataset=RANDOM mergeMode=FULL_REBUILD vectorCount=512000 numSegments=2 deleteRatio=0.2 mergedSize=471107 wallMs=151155.25 distanceComputations=2236629296 recall@100=0.1882 iters=2
+  iter 1/3 RANDOM SMART_MERGE n=512000 segs=2 del=0.2 wallMs=61528.41 dist=839169255
+  iter 2/3 RANDOM SMART_MERGE n=512000 segs=2 del=0.2 wallMs=60834.89 dist=839169255
+  iter 3/3 RANDOM SMART_MERGE n=512000 segs=2 del=0.2 wallMs=61381.55 dist=839169255
+RESULT label=baseline dataset=RANDOM mergeMode=SMART_MERGE vectorCount=512000 numSegments=2 deleteRatio=0.2 mergedSize=471107 wallMs=61248.28 distanceComputations=839169255 recall@100=0.1856 iters=3
+CACHE miss dataset=RANDOM vectorCount=512000 numSegments=5 — building segment graphs
+  building segment 1/5 size=307200
+  building segment 2/5 size=51200
+  building segment 3/5 size=51200
+  building segment 4/5 size=51200
+  building segment 5/5 size=51200
+  iter 1/2 RANDOM FULL_REBUILD n=512000 segs=5 del=0.0 wallMs=166097.64 dist=2439514737
+  iter 2/2 RANDOM FULL_REBUILD n=512000 segs=5 del=0.0 wallMs=169109.07 dist=2439514737
+RESULT label=baseline dataset=RANDOM mergeMode=FULL_REBUILD vectorCount=512000 numSegments=5 deleteRatio=0.0 mergedSize=512000 wallMs=167603.35 distanceComputations=2439514737 recall@100=0.1791 iters=2
+  iter 1/3 RANDOM SMART_MERGE n=512000 segs=5 del=0.0 wallMs=82033.34 dist=801616499
+  iter 2/3 RANDOM SMART_MERGE n=512000 segs=5 del=0.0 wallMs=62272.39 dist=801616499
+  iter 3/3 RANDOM SMART_MERGE n=512000 segs=5 del=0.0 wallMs=60049.35 dist=801616499
+RESULT label=baseline dataset=RANDOM mergeMode=SMART_MERGE vectorCount=512000 numSegments=5 deleteRatio=0.0 mergedSize=512000 wallMs=68118.36 distanceComputations=801616499 recall@100=0.1784 iters=3
+  iter 1/2 RANDOM FULL_REBUILD n=512000 segs=5 del=0.2 wallMs=149881.07 dist=2236629296
+  iter 2/2 RANDOM FULL_REBUILD n=512000 segs=5 del=0.2 wallMs=153310.87 dist=2236629296
+RESULT label=baseline dataset=RANDOM mergeMode=FULL_REBUILD vectorCount=512000 numSegments=5 deleteRatio=0.2 mergedSize=471107 wallMs=151595.97 distanceComputations=2236629296 recall@100=0.1882 iters=2
+  iter 1/3 RANDOM SMART_MERGE n=512000 segs=5 del=0.2 wallMs=62889.49 dist=839169255
+  iter 2/3 RANDOM SMART_MERGE n=512000 segs=5 del=0.2 wallMs=63085.56 dist=839169255
+  iter 3/3 RANDOM SMART_MERGE n=512000 segs=5 del=0.2 wallMs=63477.70 dist=839169255
+RESULT label=baseline dataset=RANDOM mergeMode=SMART_MERGE vectorCount=512000 numSegments=5 deleteRatio=0.2 mergedSize=471107 wallMs=63150.92 distanceComputations=839169255 recall@100=0.1856 iters=3
+CACHE miss dataset=SIFT vectorCount=200000 numSegments=2 — building segment graphs
+  building segment 1/2 size=120000
+  building segment 2/2 size=80000
+  iter 1/2 SIFT FULL_REBUILD n=200000 segs=2 del=0.0 wallMs=28632.86 dist=385680389
+  iter 2/2 SIFT FULL_REBUILD n=200000 segs=2 del=0.0 wallMs=28794.36 dist=385680389
+RESULT label=baseline dataset=SIFT mergeMode=FULL_REBUILD vectorCount=200000 numSegments=2 deleteRatio=0.0 mergedSize=200000 wallMs=28713.61 distanceComputations=385680389 recall@100=0.9649 iters=2
+  iter 1/3 SIFT SMART_MERGE n=200000 segs=2 del=0.0 wallMs=9519.73 dist=114938654
+  iter 2/3 SIFT SMART_MERGE n=200000 segs=2 del=0.0 wallMs=9523.14 dist=114938654
+  iter 3/3 SIFT SMART_MERGE n=200000 segs=2 del=0.0 wallMs=9585.20 dist=114938654
+RESULT label=baseline dataset=SIFT mergeMode=SMART_MERGE vectorCount=200000 numSegments=2 deleteRatio=0.0 mergedSize=200000 wallMs=9542.69 distanceComputations=114938654 recall@100=0.9569 iters=3
+  iter 1/2 SIFT FULL_REBUILD n=200000 segs=2 del=0.2 wallMs=26162.18 dist=350743934
+  iter 2/2 SIFT FULL_REBUILD n=200000 segs=2 del=0.2 wallMs=26329.32 dist=350743934
+RESULT label=baseline dataset=SIFT mergeMode=FULL_REBUILD vectorCount=200000 numSegments=2 deleteRatio=0.2 mergedSize=184081 wallMs=26245.75 distanceComputations=350743934 recall@100=0.9636 iters=2
+  iter 1/3 SIFT SMART_MERGE n=200000 segs=2 del=0.2 wallMs=10706.65 dist=141074013
+  iter 2/3 SIFT SMART_MERGE n=200000 segs=2 del=0.2 wallMs=10664.44 dist=141074013
+  iter 3/3 SIFT SMART_MERGE n=200000 segs=2 del=0.2 wallMs=10864.65 dist=141074013
+RESULT label=baseline dataset=SIFT mergeMode=SMART_MERGE vectorCount=200000 numSegments=2 deleteRatio=0.2 mergedSize=184081 wallMs=10745.25 distanceComputations=141074013 recall@100=0.9633 iters=3
+CACHE miss dataset=SIFT vectorCount=200000 numSegments=5 — building segment graphs
+  building segment 1/5 size=120000
+  building segment 2/5 size=20000
+  building segment 3/5 size=20000
+  building segment 4/5 size=20000
+  building segment 5/5 size=20000
+  iter 1/2 SIFT FULL_REBUILD n=200000 segs=5 del=0.0 wallMs=28213.91 dist=385680389
+  iter 2/2 SIFT FULL_REBUILD n=200000 segs=5 del=0.0 wallMs=27728.61 dist=385680389
+RESULT label=baseline dataset=SIFT mergeMode=FULL_REBUILD vectorCount=200000 numSegments=5 deleteRatio=0.0 mergedSize=200000 wallMs=27971.26 distanceComputations=385680389 recall@100=0.9649 iters=2
+  iter 1/3 SIFT SMART_MERGE n=200000 segs=5 del=0.0 wallMs=9132.58 dist=114228237
+  iter 2/3 SIFT SMART_MERGE n=200000 segs=5 del=0.0 wallMs=9132.75 dist=114228237
+  iter 3/3 SIFT SMART_MERGE n=200000 segs=5 del=0.0 wallMs=9074.78 dist=114228237
+RESULT label=baseline dataset=SIFT mergeMode=SMART_MERGE vectorCount=200000 numSegments=5 deleteRatio=0.0 mergedSize=200000 wallMs=9113.37 distanceComputations=114228237 recall@100=0.9542 iters=3
+  iter 1/2 SIFT FULL_REBUILD n=200000 segs=5 del=0.2 wallMs=25326.75 dist=350743934
+  iter 2/2 SIFT FULL_REBUILD n=200000 segs=5 del=0.2 wallMs=26982.43 dist=350743934
+RESULT label=baseline dataset=SIFT mergeMode=FULL_REBUILD vectorCount=200000 numSegments=5 deleteRatio=0.2 mergedSize=184081 wallMs=26154.59 distanceComputations=350743934 recall@100=0.9636 iters=2
+  iter 1/3 SIFT SMART_MERGE n=200000 segs=5 del=0.2 wallMs=10789.49 dist=141074013
+  iter 2/3 SIFT SMART_MERGE n=200000 segs=5 del=0.2 wallMs=10928.04 dist=141074013
+  iter 3/3 SIFT SMART_MERGE n=200000 segs=5 del=0.2 wallMs=10803.61 dist=141074013
+RESULT label=baseline dataset=SIFT mergeMode=SMART_MERGE vectorCount=200000 numSegments=5 deleteRatio=0.2 mergedSize=184081 wallMs=10840.38 distanceComputations=141074013 recall@100=0.9633 iters=3
+CACHE miss dataset=SIFT vectorCount=512000 numSegments=2 — building segment graphs
+  building segment 1/2 size=307200
+  building segment 2/2 size=204800
+  iter 1/2 SIFT FULL_REBUILD n=512000 segs=2 del=0.0 wallMs=92380.05 dist=1092066976
+  iter 2/2 SIFT FULL_REBUILD n=512000 segs=2 del=0.0 wallMs=92836.92 dist=1092066976
+RESULT label=baseline dataset=SIFT mergeMode=FULL_REBUILD vectorCount=512000 numSegments=2 deleteRatio=0.0 mergedSize=512000 wallMs=92608.48 distanceComputations=1092066976 recall@100=0.9446 iters=2
+  iter 1/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 wallMs=30676.19 dist=312875566
+  iter 2/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 wallMs=31068.76 dist=312875566
+  iter 3/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 wallMs=31208.34 dist=312875566
+RESULT label=baseline dataset=SIFT mergeMode=SMART_MERGE vectorCount=512000 numSegments=2 deleteRatio=0.0 mergedSize=512000 wallMs=30984.43 distanceComputations=312875566 recall@100=0.9331 iters=3
+  iter 1/2 SIFT FULL_REBUILD n=512000 segs=2 del=0.2 wallMs=86035.04 dist=997164108
+  iter 2/2 SIFT FULL_REBUILD n=512000 segs=2 del=0.2 wallMs=83680.89 dist=997164108
+RESULT label=baseline dataset=SIFT mergeMode=FULL_REBUILD vectorCount=512000 numSegments=2 deleteRatio=0.2 mergedSize=471107 wallMs=84857.97 distanceComputations=997164108 recall@100=0.9461 iters=2
+  iter 1/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 wallMs=33902.26 dist=381583074
+  iter 2/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 wallMs=33567.41 dist=381583074
+  iter 3/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 wallMs=35024.42 dist=381583074
+RESULT label=baseline dataset=SIFT mergeMode=SMART_MERGE vectorCount=512000 numSegments=2 deleteRatio=0.2 mergedSize=471107 wallMs=34164.70 distanceComputations=381583074 recall@100=0.9466 iters=3
+CACHE miss dataset=SIFT vectorCount=512000 numSegments=5 — building segment graphs
+  building segment 1/5 size=307200
+  building segment 2/5 size=51200
+  building segment 3/5 size=51200
+  building segment 4/5 size=51200
+  building segment 5/5 size=51200
+  iter 1/2 SIFT FULL_REBUILD n=512000 segs=5 del=0.0 wallMs=94827.76 dist=1092066976
+  iter 2/2 SIFT FULL_REBUILD n=512000 segs=5 del=0.0 wallMs=94069.36 dist=1092066976
+RESULT label=baseline dataset=SIFT mergeMode=FULL_REBUILD vectorCount=512000 numSegments=5 deleteRatio=0.0 mergedSize=512000 wallMs=94448.56 distanceComputations=1092066976 recall@100=0.9446 iters=2
+  iter 1/3 SIFT SMART_MERGE n=512000 segs=5 del=0.0 wallMs=30874.47 dist=309755890
+  iter 2/3 SIFT SMART_MERGE n=512000 segs=5 del=0.0 wallMs=30170.59 dist=309755890
+  iter 3/3 SIFT SMART_MERGE n=512000 segs=5 del=0.0 wallMs=29845.58 dist=309755890
+RESULT label=baseline dataset=SIFT mergeMode=SMART_MERGE vectorCount=512000 numSegments=5 deleteRatio=0.0 mergedSize=512000 wallMs=30296.88 distanceComputations=309755890 recall@100=0.9341 iters=3
+  iter 1/2 SIFT FULL_REBUILD n=512000 segs=5 del=0.2 wallMs=85240.38 dist=997164108
+  iter 2/2 SIFT FULL_REBUILD n=512000 segs=5 del=0.2 wallMs=85686.10 dist=997164108
+RESULT label=baseline dataset=SIFT mergeMode=FULL_REBUILD vectorCount=512000 numSegments=5 deleteRatio=0.2 mergedSize=471107 wallMs=85463.24 distanceComputations=997164108 recall@100=0.9461 iters=2
+  iter 1/3 SIFT SMART_MERGE n=512000 segs=5 del=0.2 wallMs=36246.35 dist=381583074
+  iter 2/3 SIFT SMART_MERGE n=512000 segs=5 del=0.2 wallMs=34543.28 dist=381583074
+  iter 3/3 SIFT SMART_MERGE n=512000 segs=5 del=0.2 wallMs=35006.45 dist=381583074
+RESULT label=baseline dataset=SIFT mergeMode=SMART_MERGE vectorCount=512000 numSegments=5 deleteRatio=0.2 mergedSize=471107 wallMs=35265.36 distanceComputations=381583074 recall@100=0.9466 iters=3

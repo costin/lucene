@@ -1,0 +1,10 @@
+Picked up JAVA_TOOL_OPTIONS: -Dhnsw.lazy.repair=thorough
+WARNING: Using incubator modules: jdk.incubator.vector
+HnswMergeResearch label=lazy-thorough-smoke datasets=SIFT vectorCounts=20000 segs=2 deletes=0.0 modes=SMART_MERGE mergeIters=1 rebuildIters=1
+CACHE miss dataset=SIFT vectorCount=20000 numSegments=2 — building segment graphs
+  building segment 1/2 size=12000
+Sep 08, 2026 10:40:07 AM org.apache.lucene.internal.vectorization.PanamaVectorizationProvider logIncubatorSetup
+INFO: Java vector incubator API enabled; uses preferredBitSize=512; FMA enabled
+  building segment 2/2 size=8000
+  iter 1/1 SIFT SMART_MERGE n=20000 segs=2 del=0.0 wallMs=2339.78 dist=39576551
+RESULT label=lazy-thorough-smoke dataset=SIFT mergeMode=SMART_MERGE vectorCount=20000 numSegments=2 deleteRatio=0.0 mergedSize=20000 wallMs=2339.78 distanceComputations=39576551 recall@100=0.9826 iters=1

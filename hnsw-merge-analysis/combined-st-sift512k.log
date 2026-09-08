@@ -1,0 +1,67 @@
+WARNING: Using incubator modules: jdk.incubator.vector
+HnswMergeResearch label=combined-st-sift512k datasets=SIFT vectorCounts=512000 segs=2 deletes=0.0,0.2 modes=SMART_MERGE,COMBINED beamWidths=100,64,48 numWorkers=0 warmup=1 mergeIters=3 rebuildIters=3
+CACHE miss dataset=SIFT vectorCount=512000 numSegments=2 — building segment graphs
+  building segment 1/2 size=307200
+Sep 08, 2026 1:18:23 PM org.apache.lucene.internal.vectorization.PanamaVectorizationProvider logIncubatorSetup
+INFO: Java vector incubator API enabled; uses preferredBitSize=512; FMA enabled
+  building segment 2/2 size=204800
+  warmup 1/1 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=100 workers=1 dist=312875566
+  iter 1/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=100 workers=1 wallMs=32206.41 dist=312875566
+  iter 2/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=100 workers=1 wallMs=33185.18 dist=312875566
+  iter 3/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=100 workers=1 wallMs=32484.40 dist=312875566
+RESULT label=combined-st-sift512k dataset=SIFT mergeMode=SMART_MERGE vectorCount=512000 numSegments=2 deleteRatio=0.0 mergedSize=512000 wallMs=32625.33 distanceComputations=312875566 recall@100=0.9331 mdr=1.0018 epsRecall@100=0.9977 iters=3 beamWidth=100 numWorkers=1
+  warmup 1/1 SIFT COMBINED n=512000 segs=2 del=0.0 beam=100 workers=1 dist=980155079
+  iter 1/3 SIFT COMBINED n=512000 segs=2 del=0.0 beam=100 workers=1 wallMs=102908.29 dist=980155079
+  iter 2/3 SIFT COMBINED n=512000 segs=2 del=0.0 beam=100 workers=1 wallMs=101680.69 dist=980155079
+  iter 3/3 SIFT COMBINED n=512000 segs=2 del=0.0 beam=100 workers=1 wallMs=104595.23 dist=980155079
+RESULT label=combined-st-sift512k dataset=SIFT mergeMode=COMBINED vectorCount=512000 numSegments=2 deleteRatio=0.0 mergedSize=512000 wallMs=103061.40 distanceComputations=980155079 recall@100=0.8523 mdr=1.0027 epsRecall@100=0.9967 iters=3 beamWidth=100 numWorkers=1
+  warmup 1/1 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=64 workers=1 dist=216856395
+  iter 1/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=64 workers=1 wallMs=24573.42 dist=216856395
+  iter 2/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=64 workers=1 wallMs=23943.99 dist=216856395
+  iter 3/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=64 workers=1 wallMs=24145.84 dist=216856395
+RESULT label=combined-st-sift512k dataset=SIFT mergeMode=SMART_MERGE vectorCount=512000 numSegments=2 deleteRatio=0.0 mergedSize=512000 wallMs=24221.08 distanceComputations=216856395 recall@100=0.9229 mdr=1.0021 epsRecall@100=0.9963 iters=3 beamWidth=64 numWorkers=1
+  warmup 1/1 SIFT COMBINED n=512000 segs=2 del=0.0 beam=64 workers=1 dist=669975120
+  iter 1/3 SIFT COMBINED n=512000 segs=2 del=0.0 beam=64 workers=1 wallMs=70401.14 dist=669975120
+  iter 2/3 SIFT COMBINED n=512000 segs=2 del=0.0 beam=64 workers=1 wallMs=69464.87 dist=669975120
+  iter 3/3 SIFT COMBINED n=512000 segs=2 del=0.0 beam=64 workers=1 wallMs=71841.61 dist=669975120
+RESULT label=combined-st-sift512k dataset=SIFT mergeMode=COMBINED vectorCount=512000 numSegments=2 deleteRatio=0.0 mergedSize=512000 wallMs=70569.21 distanceComputations=669975120 recall@100=0.8474 mdr=1.0030 epsRecall@100=0.9942 iters=3 beamWidth=64 numWorkers=1
+  warmup 1/1 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=48 workers=1 dist=170491700
+  iter 1/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=48 workers=1 wallMs=20135.44 dist=170491700
+  iter 2/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=48 workers=1 wallMs=20834.96 dist=170491700
+  iter 3/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 beam=48 workers=1 wallMs=20265.68 dist=170491700
+RESULT label=combined-st-sift512k dataset=SIFT mergeMode=SMART_MERGE vectorCount=512000 numSegments=2 deleteRatio=0.0 mergedSize=512000 wallMs=20412.03 distanceComputations=170491700 recall@100=0.9145 mdr=1.0024 epsRecall@100=0.9944 iters=3 beamWidth=48 numWorkers=1
+  warmup 1/1 SIFT COMBINED n=512000 segs=2 del=0.0 beam=48 workers=1 dist=524104843
+  iter 1/3 SIFT COMBINED n=512000 segs=2 del=0.0 beam=48 workers=1 wallMs=51672.87 dist=524104843
+  iter 2/3 SIFT COMBINED n=512000 segs=2 del=0.0 beam=48 workers=1 wallMs=52116.25 dist=524104843
+  iter 3/3 SIFT COMBINED n=512000 segs=2 del=0.0 beam=48 workers=1 wallMs=52179.40 dist=524104843
+RESULT label=combined-st-sift512k dataset=SIFT mergeMode=COMBINED vectorCount=512000 numSegments=2 deleteRatio=0.0 mergedSize=512000 wallMs=51989.51 distanceComputations=524104843 recall@100=0.8436 mdr=1.0031 epsRecall@100=0.9935 iters=3 beamWidth=48 numWorkers=1
+  warmup 1/1 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=100 workers=1 dist=381583074
+  iter 1/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=100 workers=1 wallMs=38607.34 dist=381583074
+  iter 2/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=100 workers=1 wallMs=36381.66 dist=381583074
+  iter 3/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=100 workers=1 wallMs=34906.82 dist=381583074
+RESULT label=combined-st-sift512k dataset=SIFT mergeMode=SMART_MERGE vectorCount=512000 numSegments=2 deleteRatio=0.2 mergedSize=471107 wallMs=36631.94 distanceComputations=381583074 recall@100=0.9466 mdr=1.0013 epsRecall@100=0.9987 iters=3 beamWidth=100 numWorkers=1
+  warmup 1/1 SIFT COMBINED n=512000 segs=2 del=0.2 beam=100 workers=1 dist=435867528
+  iter 1/3 SIFT COMBINED n=512000 segs=2 del=0.2 beam=100 workers=1 wallMs=45081.01 dist=435867528
+  iter 2/3 SIFT COMBINED n=512000 segs=2 del=0.2 beam=100 workers=1 wallMs=35208.07 dist=435867528
+  iter 3/3 SIFT COMBINED n=512000 segs=2 del=0.2 beam=100 workers=1 wallMs=35205.50 dist=435867528
+RESULT label=combined-st-sift512k dataset=SIFT mergeMode=COMBINED vectorCount=512000 numSegments=2 deleteRatio=0.2 mergedSize=471107 wallMs=38498.19 distanceComputations=435867528 recall@100=0.7840 mdr=1.0065 epsRecall@100=0.9682 iters=3 beamWidth=100 numWorkers=1
+  warmup 1/1 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=64 workers=1 dist=252507454
+  iter 1/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=64 workers=1 wallMs=23537.95 dist=252507454
+  iter 2/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=64 workers=1 wallMs=23710.78 dist=252507454
+  iter 3/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=64 workers=1 wallMs=24129.19 dist=252507454
+RESULT label=combined-st-sift512k dataset=SIFT mergeMode=SMART_MERGE vectorCount=512000 numSegments=2 deleteRatio=0.2 mergedSize=471107 wallMs=23792.64 distanceComputations=252507454 recall@100=0.9379 mdr=1.0017 epsRecall@100=0.9983 iters=3 beamWidth=64 numWorkers=1
+  warmup 1/1 SIFT COMBINED n=512000 segs=2 del=0.2 beam=64 workers=1 dist=308731248
+  iter 1/3 SIFT COMBINED n=512000 segs=2 del=0.2 beam=64 workers=1 wallMs=24852.01 dist=308731248
+  iter 2/3 SIFT COMBINED n=512000 segs=2 del=0.2 beam=64 workers=1 wallMs=24871.91 dist=308731248
+  iter 3/3 SIFT COMBINED n=512000 segs=2 del=0.2 beam=64 workers=1 wallMs=24545.84 dist=308731248
+RESULT label=combined-st-sift512k dataset=SIFT mergeMode=COMBINED vectorCount=512000 numSegments=2 deleteRatio=0.2 mergedSize=471107 wallMs=24756.59 distanceComputations=308731248 recall@100=0.7744 mdr=1.0071 epsRecall@100=0.9604 iters=3 beamWidth=64 numWorkers=1
+  warmup 1/1 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=48 workers=1 dist=195242163
+  iter 1/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=48 workers=1 wallMs=18262.42 dist=195242163
+  iter 2/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=48 workers=1 wallMs=18367.32 dist=195242163
+  iter 3/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 beam=48 workers=1 wallMs=18887.80 dist=195242163
+RESULT label=combined-st-sift512k dataset=SIFT mergeMode=SMART_MERGE vectorCount=512000 numSegments=2 deleteRatio=0.2 mergedSize=471107 wallMs=18505.85 distanceComputations=195242163 recall@100=0.9312 mdr=1.0019 epsRecall@100=0.9977 iters=3 beamWidth=48 numWorkers=1
+  warmup 1/1 SIFT COMBINED n=512000 segs=2 del=0.2 beam=48 workers=1 dist=250414845
+  iter 1/3 SIFT COMBINED n=512000 segs=2 del=0.2 beam=48 workers=1 wallMs=20329.79 dist=250414845
+  iter 2/3 SIFT COMBINED n=512000 segs=2 del=0.2 beam=48 workers=1 wallMs=20393.33 dist=250414845
+  iter 3/3 SIFT COMBINED n=512000 segs=2 del=0.2 beam=48 workers=1 wallMs=19925.40 dist=250414845
+RESULT label=combined-st-sift512k dataset=SIFT mergeMode=COMBINED vectorCount=512000 numSegments=2 deleteRatio=0.2 mergedSize=471107 wallMs=20216.17 distanceComputations=250414845 recall@100=0.7681 mdr=1.0074 epsRecall@100=0.9564 iters=3 beamWidth=48 numWorkers=1

@@ -1,0 +1,109 @@
+WARNING: Using incubator modules: jdk.incubator.vector
+HnswMergeResearch label=combined-st-random200k datasets=RANDOM vectorCounts=200000 segs=2,5 deletes=0.0,0.2 modes=SMART_MERGE,COMBINED beamWidths=100,64,48 numWorkers=0 warmup=1 mergeIters=2 rebuildIters=2
+CACHE miss dataset=RANDOM vectorCount=200000 numSegments=2 — building segment graphs
+  building segment 1/2 size=120000
+Sep 08, 2026 2:27:47 PM org.apache.lucene.internal.vectorization.PanamaVectorizationProvider logIncubatorSetup
+INFO: Java vector incubator API enabled; uses preferredBitSize=512; FMA enabled
+  building segment 2/2 size=80000
+  warmup 1/1 RANDOM SMART_MERGE n=200000 segs=2 del=0.0 beam=100 workers=1 dist=309213388
+  iter 1/2 RANDOM SMART_MERGE n=200000 segs=2 del=0.0 beam=100 workers=1 wallMs=22088.97 dist=309213388
+  iter 2/2 RANDOM SMART_MERGE n=200000 segs=2 del=0.0 beam=100 workers=1 wallMs=21852.42 dist=309213388
+RESULT label=combined-st-random200k dataset=RANDOM mergeMode=SMART_MERGE vectorCount=200000 numSegments=2 deleteRatio=0.0 mergedSize=200000 wallMs=21970.69 distanceComputations=309213388 recall@100=0.2784 mdr=1.0238 epsRecall@100=0.4377 iters=2 beamWidth=100 numWorkers=1
+  warmup 1/1 RANDOM COMBINED n=200000 segs=2 del=0.0 beam=100 workers=1 dist=630156826
+  iter 1/2 RANDOM COMBINED n=200000 segs=2 del=0.0 beam=100 workers=1 wallMs=51889.73 dist=630156826
+  iter 2/2 RANDOM COMBINED n=200000 segs=2 del=0.0 beam=100 workers=1 wallMs=52124.46 dist=630156826
+RESULT label=combined-st-random200k dataset=RANDOM mergeMode=COMBINED vectorCount=200000 numSegments=2 deleteRatio=0.0 mergedSize=200000 wallMs=52007.09 distanceComputations=630156826 recall@100=0.2893 mdr=1.0229 epsRecall@100=0.4568 iters=2 beamWidth=100 numWorkers=1
+  warmup 1/1 RANDOM SMART_MERGE n=200000 segs=2 del=0.0 beam=64 workers=1 dist=214498582
+  iter 1/2 RANDOM SMART_MERGE n=200000 segs=2 del=0.0 beam=64 workers=1 wallMs=14951.23 dist=214498582
+  iter 2/2 RANDOM SMART_MERGE n=200000 segs=2 del=0.0 beam=64 workers=1 wallMs=14793.57 dist=214498582
+RESULT label=combined-st-random200k dataset=RANDOM mergeMode=SMART_MERGE vectorCount=200000 numSegments=2 deleteRatio=0.0 mergedSize=200000 wallMs=14872.40 distanceComputations=214498582 recall@100=0.2672 mdr=1.0244 epsRecall@100=0.4292 iters=2 beamWidth=64 numWorkers=1
+  warmup 1/1 RANDOM COMBINED n=200000 segs=2 del=0.0 beam=64 workers=1 dist=446762395
+  iter 1/2 RANDOM COMBINED n=200000 segs=2 del=0.0 beam=64 workers=1 wallMs=34777.80 dist=446762395
+  iter 2/2 RANDOM COMBINED n=200000 segs=2 del=0.0 beam=64 workers=1 wallMs=33988.15 dist=446762395
+RESULT label=combined-st-random200k dataset=RANDOM mergeMode=COMBINED vectorCount=200000 numSegments=2 deleteRatio=0.0 mergedSize=200000 wallMs=34382.98 distanceComputations=446762395 recall@100=0.2798 mdr=1.0236 epsRecall@100=0.4432 iters=2 beamWidth=64 numWorkers=1
+  warmup 1/1 RANDOM SMART_MERGE n=200000 segs=2 del=0.0 beam=48 workers=1 dist=167735892
+  iter 1/2 RANDOM SMART_MERGE n=200000 segs=2 del=0.0 beam=48 workers=1 wallMs=11454.42 dist=167735892
+  iter 2/2 RANDOM SMART_MERGE n=200000 segs=2 del=0.0 beam=48 workers=1 wallMs=11503.97 dist=167735892
+RESULT label=combined-st-random200k dataset=RANDOM mergeMode=SMART_MERGE vectorCount=200000 numSegments=2 deleteRatio=0.0 mergedSize=200000 wallMs=11479.19 distanceComputations=167735892 recall@100=0.2599 mdr=1.0251 epsRecall@100=0.4134 iters=2 beamWidth=48 numWorkers=1
+  warmup 1/1 RANDOM COMBINED n=200000 segs=2 del=0.0 beam=48 workers=1 dist=351769765
+  iter 1/2 RANDOM COMBINED n=200000 segs=2 del=0.0 beam=48 workers=1 wallMs=26483.28 dist=351769765
+  iter 2/2 RANDOM COMBINED n=200000 segs=2 del=0.0 beam=48 workers=1 wallMs=25519.23 dist=351769765
+RESULT label=combined-st-random200k dataset=RANDOM mergeMode=COMBINED vectorCount=200000 numSegments=2 deleteRatio=0.0 mergedSize=200000 wallMs=26001.25 distanceComputations=351769765 recall@100=0.2774 mdr=1.0237 epsRecall@100=0.4389 iters=2 beamWidth=48 numWorkers=1
+  warmup 1/1 RANDOM SMART_MERGE n=200000 segs=2 del=0.2 beam=100 workers=1 dist=318120734
+  iter 1/2 RANDOM SMART_MERGE n=200000 segs=2 del=0.2 beam=100 workers=1 wallMs=20172.10 dist=318120734
+  iter 2/2 RANDOM SMART_MERGE n=200000 segs=2 del=0.2 beam=100 workers=1 wallMs=20242.93 dist=318120734
+RESULT label=combined-st-random200k dataset=RANDOM mergeMode=SMART_MERGE vectorCount=200000 numSegments=2 deleteRatio=0.2 mergedSize=184081 wallMs=20207.51 distanceComputations=318120734 recall@100=0.2910 mdr=1.0227 epsRecall@100=0.4643 iters=2 beamWidth=100 numWorkers=1
+  warmup 1/1 RANDOM COMBINED n=200000 segs=2 del=0.2 beam=100 workers=1 dist=325583224
+  iter 1/2 RANDOM COMBINED n=200000 segs=2 del=0.2 beam=100 workers=1 wallMs=19268.44 dist=325583224
+  iter 2/2 RANDOM COMBINED n=200000 segs=2 del=0.2 beam=100 workers=1 wallMs=19211.60 dist=325583224
+RESULT label=combined-st-random200k dataset=RANDOM mergeMode=COMBINED vectorCount=200000 numSegments=2 deleteRatio=0.2 mergedSize=184081 wallMs=19240.02 distanceComputations=325583224 recall@100=0.2792 mdr=1.0236 epsRecall@100=0.4449 iters=2 beamWidth=100 numWorkers=1
+  warmup 1/1 RANDOM SMART_MERGE n=200000 segs=2 del=0.2 beam=64 workers=1 dist=218594897
+  iter 1/2 RANDOM SMART_MERGE n=200000 segs=2 del=0.2 beam=64 workers=1 wallMs=13422.51 dist=218594897
+  iter 2/2 RANDOM SMART_MERGE n=200000 segs=2 del=0.2 beam=64 workers=1 wallMs=13535.30 dist=218594897
+RESULT label=combined-st-random200k dataset=RANDOM mergeMode=SMART_MERGE vectorCount=200000 numSegments=2 deleteRatio=0.2 mergedSize=184081 wallMs=13478.91 distanceComputations=218594897 recall@100=0.2748 mdr=1.0238 epsRecall@100=0.4407 iters=2 beamWidth=64 numWorkers=1
+  warmup 1/1 RANDOM COMBINED n=200000 segs=2 del=0.2 beam=64 workers=1 dist=228584917
+  iter 1/2 RANDOM COMBINED n=200000 segs=2 del=0.2 beam=64 workers=1 wallMs=13320.48 dist=228584917
+  iter 2/2 RANDOM COMBINED n=200000 segs=2 del=0.2 beam=64 workers=1 wallMs=13191.48 dist=228584917
+RESULT label=combined-st-random200k dataset=RANDOM mergeMode=COMBINED vectorCount=200000 numSegments=2 deleteRatio=0.2 mergedSize=184081 wallMs=13255.98 distanceComputations=228584917 recall@100=0.2684 mdr=1.0243 epsRecall@100=0.4297 iters=2 beamWidth=64 numWorkers=1
+  warmup 1/1 RANDOM SMART_MERGE n=200000 segs=2 del=0.2 beam=48 workers=1 dist=170796694
+  iter 1/2 RANDOM SMART_MERGE n=200000 segs=2 del=0.2 beam=48 workers=1 wallMs=10423.79 dist=170796694
+  iter 2/2 RANDOM SMART_MERGE n=200000 segs=2 del=0.2 beam=48 workers=1 wallMs=10470.41 dist=170796694
+RESULT label=combined-st-random200k dataset=RANDOM mergeMode=SMART_MERGE vectorCount=200000 numSegments=2 deleteRatio=0.2 mergedSize=184081 wallMs=10447.10 distanceComputations=170796694 recall@100=0.2620 mdr=1.0248 epsRecall@100=0.4214 iters=2 beamWidth=48 numWorkers=1
+  warmup 1/1 RANDOM COMBINED n=200000 segs=2 del=0.2 beam=48 workers=1 dist=181431557
+  iter 1/2 RANDOM COMBINED n=200000 segs=2 del=0.2 beam=48 workers=1 wallMs=10268.36 dist=181431557
+  iter 2/2 RANDOM COMBINED n=200000 segs=2 del=0.2 beam=48 workers=1 wallMs=10522.27 dist=181431557
+RESULT label=combined-st-random200k dataset=RANDOM mergeMode=COMBINED vectorCount=200000 numSegments=2 deleteRatio=0.2 mergedSize=184081 wallMs=10395.31 distanceComputations=181431557 recall@100=0.2590 mdr=1.0252 epsRecall@100=0.4123 iters=2 beamWidth=48 numWorkers=1
+CACHE miss dataset=RANDOM vectorCount=200000 numSegments=5 — building segment graphs
+  building segment 1/5 size=120000
+  building segment 2/5 size=20000
+  building segment 3/5 size=20000
+  building segment 4/5 size=20000
+  building segment 5/5 size=20000
+  warmup 1/1 RANDOM SMART_MERGE n=200000 segs=5 del=0.0 beam=100 workers=1 dist=296323984
+  iter 1/2 RANDOM SMART_MERGE n=200000 segs=5 del=0.0 beam=100 workers=1 wallMs=19784.26 dist=296323984
+  iter 2/2 RANDOM SMART_MERGE n=200000 segs=5 del=0.0 beam=100 workers=1 wallMs=20247.43 dist=296323984
+RESULT label=combined-st-random200k dataset=RANDOM mergeMode=SMART_MERGE vectorCount=200000 numSegments=5 deleteRatio=0.0 mergedSize=200000 wallMs=20015.85 distanceComputations=296323984 recall@100=0.2747 mdr=1.0239 epsRecall@100=0.4362 iters=2 beamWidth=100 numWorkers=1
+  warmup 1/1 RANDOM COMBINED n=200000 segs=5 del=0.0 beam=100 workers=1 dist=1338978534
+  iter 1/2 RANDOM COMBINED n=200000 segs=5 del=0.0 beam=100 workers=1 wallMs=129088.83 dist=1338978534
+  iter 2/2 RANDOM COMBINED n=200000 segs=5 del=0.0 beam=100 workers=1 wallMs=125725.13 dist=1338978534
+RESULT label=combined-st-random200k dataset=RANDOM mergeMode=COMBINED vectorCount=200000 numSegments=5 deleteRatio=0.0 mergedSize=200000 wallMs=127406.98 distanceComputations=1338978534 recall@100=0.2919 mdr=1.0226 epsRecall@100=0.4645 iters=2 beamWidth=100 numWorkers=1
+  warmup 1/1 RANDOM SMART_MERGE n=200000 segs=5 del=0.0 beam=64 workers=1 dist=204207829
+  iter 1/2 RANDOM SMART_MERGE n=200000 segs=5 del=0.0 beam=64 workers=1 wallMs=13828.35 dist=204207829
+  iter 2/2 RANDOM SMART_MERGE n=200000 segs=5 del=0.0 beam=64 workers=1 wallMs=13859.37 dist=204207829
+RESULT label=combined-st-random200k dataset=RANDOM mergeMode=SMART_MERGE vectorCount=200000 numSegments=5 deleteRatio=0.0 mergedSize=200000 wallMs=13843.86 distanceComputations=204207829 recall@100=0.2572 mdr=1.0252 epsRecall@100=0.4128 iters=2 beamWidth=64 numWorkers=1
+  warmup 1/1 RANDOM COMBINED n=200000 segs=5 del=0.0 beam=64 workers=1 dist=983932252
+  iter 1/2 RANDOM COMBINED n=200000 segs=5 del=0.0 beam=64 workers=1 wallMs=83582.91 dist=983932252
+  iter 2/2 RANDOM COMBINED n=200000 segs=5 del=0.0 beam=64 workers=1 wallMs=84260.80 dist=983932252
+RESULT label=combined-st-random200k dataset=RANDOM mergeMode=COMBINED vectorCount=200000 numSegments=5 deleteRatio=0.0 mergedSize=200000 wallMs=83921.86 distanceComputations=983932252 recall@100=0.2878 mdr=1.0229 epsRecall@100=0.4575 iters=2 beamWidth=64 numWorkers=1
+  warmup 1/1 RANDOM SMART_MERGE n=200000 segs=5 del=0.0 beam=48 workers=1 dist=159028977
+  iter 1/2 RANDOM SMART_MERGE n=200000 segs=5 del=0.0 beam=48 workers=1 wallMs=10469.61 dist=159028977
+  iter 2/2 RANDOM SMART_MERGE n=200000 segs=5 del=0.0 beam=48 workers=1 wallMs=10099.80 dist=159028977
+RESULT label=combined-st-random200k dataset=RANDOM mergeMode=SMART_MERGE vectorCount=200000 numSegments=5 deleteRatio=0.0 mergedSize=200000 wallMs=10284.71 distanceComputations=159028977 recall@100=0.2528 mdr=1.0258 epsRecall@100=0.4023 iters=2 beamWidth=48 numWorkers=1
+  warmup 1/1 RANDOM COMBINED n=200000 segs=5 del=0.0 beam=48 workers=1 dist=805712553
+  iter 1/2 RANDOM COMBINED n=200000 segs=5 del=0.0 beam=48 workers=1 wallMs=64410.79 dist=805712553
+  iter 2/2 RANDOM COMBINED n=200000 segs=5 del=0.0 beam=48 workers=1 wallMs=66342.65 dist=805712553
+RESULT label=combined-st-random200k dataset=RANDOM mergeMode=COMBINED vectorCount=200000 numSegments=5 deleteRatio=0.0 mergedSize=200000 wallMs=65376.72 distanceComputations=805712553 recall@100=0.2921 mdr=1.0229 epsRecall@100=0.4571 iters=2 beamWidth=48 numWorkers=1
+  warmup 1/1 RANDOM SMART_MERGE n=200000 segs=5 del=0.2 beam=100 workers=1 dist=318120734
+  iter 1/2 RANDOM SMART_MERGE n=200000 segs=5 del=0.2 beam=100 workers=1 wallMs=19763.16 dist=318120734
+  iter 2/2 RANDOM SMART_MERGE n=200000 segs=5 del=0.2 beam=100 workers=1 wallMs=20375.25 dist=318120734
+RESULT label=combined-st-random200k dataset=RANDOM mergeMode=SMART_MERGE vectorCount=200000 numSegments=5 deleteRatio=0.2 mergedSize=184081 wallMs=20069.21 distanceComputations=318120734 recall@100=0.2910 mdr=1.0227 epsRecall@100=0.4643 iters=2 beamWidth=100 numWorkers=1
+  warmup 1/1 RANDOM COMBINED n=200000 segs=5 del=0.2 beam=100 workers=1 dist=325583224
+  iter 1/2 RANDOM COMBINED n=200000 segs=5 del=0.2 beam=100 workers=1 wallMs=18758.68 dist=325583224
+  iter 2/2 RANDOM COMBINED n=200000 segs=5 del=0.2 beam=100 workers=1 wallMs=18674.94 dist=325583224
+RESULT label=combined-st-random200k dataset=RANDOM mergeMode=COMBINED vectorCount=200000 numSegments=5 deleteRatio=0.2 mergedSize=184081 wallMs=18716.81 distanceComputations=325583224 recall@100=0.2792 mdr=1.0236 epsRecall@100=0.4449 iters=2 beamWidth=100 numWorkers=1
+  warmup 1/1 RANDOM SMART_MERGE n=200000 segs=5 del=0.2 beam=64 workers=1 dist=218594897
+  iter 1/2 RANDOM SMART_MERGE n=200000 segs=5 del=0.2 beam=64 workers=1 wallMs=13346.60 dist=218594897
+  iter 2/2 RANDOM SMART_MERGE n=200000 segs=5 del=0.2 beam=64 workers=1 wallMs=13259.23 dist=218594897
+RESULT label=combined-st-random200k dataset=RANDOM mergeMode=SMART_MERGE vectorCount=200000 numSegments=5 deleteRatio=0.2 mergedSize=184081 wallMs=13302.91 distanceComputations=218594897 recall@100=0.2748 mdr=1.0238 epsRecall@100=0.4407 iters=2 beamWidth=64 numWorkers=1
+  warmup 1/1 RANDOM COMBINED n=200000 segs=5 del=0.2 beam=64 workers=1 dist=228584917
+  iter 1/2 RANDOM COMBINED n=200000 segs=5 del=0.2 beam=64 workers=1 wallMs=12910.56 dist=228584917
+  iter 2/2 RANDOM COMBINED n=200000 segs=5 del=0.2 beam=64 workers=1 wallMs=13099.27 dist=228584917
+RESULT label=combined-st-random200k dataset=RANDOM mergeMode=COMBINED vectorCount=200000 numSegments=5 deleteRatio=0.2 mergedSize=184081 wallMs=13004.91 distanceComputations=228584917 recall@100=0.2684 mdr=1.0243 epsRecall@100=0.4297 iters=2 beamWidth=64 numWorkers=1
+  warmup 1/1 RANDOM SMART_MERGE n=200000 segs=5 del=0.2 beam=48 workers=1 dist=170796694
+  iter 1/2 RANDOM SMART_MERGE n=200000 segs=5 del=0.2 beam=48 workers=1 wallMs=10553.88 dist=170796694
+  iter 2/2 RANDOM SMART_MERGE n=200000 segs=5 del=0.2 beam=48 workers=1 wallMs=10671.19 dist=170796694
+RESULT label=combined-st-random200k dataset=RANDOM mergeMode=SMART_MERGE vectorCount=200000 numSegments=5 deleteRatio=0.2 mergedSize=184081 wallMs=10612.53 distanceComputations=170796694 recall@100=0.2620 mdr=1.0248 epsRecall@100=0.4214 iters=2 beamWidth=48 numWorkers=1
+  warmup 1/1 RANDOM COMBINED n=200000 segs=5 del=0.2 beam=48 workers=1 dist=181431557
+  iter 1/2 RANDOM COMBINED n=200000 segs=5 del=0.2 beam=48 workers=1 wallMs=10522.39 dist=181431557
+  iter 2/2 RANDOM COMBINED n=200000 segs=5 del=0.2 beam=48 workers=1 wallMs=10753.54 dist=181431557
+RESULT label=combined-st-random200k dataset=RANDOM mergeMode=COMBINED vectorCount=200000 numSegments=5 deleteRatio=0.2 mergedSize=184081 wallMs=10637.96 distanceComputations=181431557 recall@100=0.2590 mdr=1.0252 epsRecall@100=0.4123 iters=2 beamWidth=48 numWorkers=1

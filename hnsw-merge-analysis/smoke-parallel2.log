@@ -1,0 +1,19 @@
+WARNING: Using incubator modules: jdk.incubator.vector
+HnswMergeResearch label=smoke-parallel2 datasets=SIFT vectorCounts=20000 segs=2 deletes=0.0 modes=SMART_MERGE,COMBINED beamWidths=100 numWorkers=1,2,4 warmup=0 mergeIters=1 rebuildIters=1
+CACHE miss dataset=SIFT vectorCount=20000 numSegments=2 — building segment graphs
+  building segment 1/2 size=12000
+Sep 08, 2026 12:47:28 PM org.apache.lucene.internal.vectorization.PanamaVectorizationProvider logIncubatorSetup
+INFO: Java vector incubator API enabled; uses preferredBitSize=512; FMA enabled
+  building segment 2/2 size=8000
+  iter 1/1 SIFT SMART_MERGE n=20000 segs=2 del=0.0 beam=100 workers=1 wallMs=967.04 dist=13899172
+RESULT label=smoke-parallel2 dataset=SIFT mergeMode=SMART_MERGE vectorCount=20000 numSegments=2 deleteRatio=0.0 mergedSize=20000 wallMs=967.04 distanceComputations=13899172 recall@100=0.9897 mdr=1.0002 epsRecall@100=1.0000 iters=1 beamWidth=100 numWorkers=1 buildMs=950.58 writeLockWaitMs=4.021 writeLockCount=97391 incomingWaitMs=0.000 incomingCount=0 effectiveConcurrency=0.998 workerThreads=1 blockedPct=0.00 runnableSamples=47 blockedSamples=0
+  iter 1/1 SIFT COMBINED n=20000 segs=2 del=0.0 beam=100 workers=1 wallMs=2743.21 dist=34876446
+RESULT label=smoke-parallel2 dataset=SIFT mergeMode=COMBINED vectorCount=20000 numSegments=2 deleteRatio=0.0 mergedSize=20000 wallMs=2743.21 distanceComputations=34876446 recall@100=0.9735 mdr=1.0006 epsRecall@100=1.0000 iters=1 beamWidth=100 numWorkers=1 buildMs=2730.70 writeLockWaitMs=0.000 writeLockCount=0 incomingWaitMs=7.076 incomingCount=105439 effectiveConcurrency=0.789 workerThreads=1 blockedPct=0.00 runnableSamples=133 blockedSamples=0
+  iter 1/1 SIFT SMART_MERGE n=20000 segs=2 del=0.0 beam=100 workers=2 wallMs=540.23 dist=13854694
+RESULT label=smoke-parallel2 dataset=SIFT mergeMode=SMART_MERGE vectorCount=20000 numSegments=2 deleteRatio=0.0 mergedSize=20000 wallMs=540.23 distanceComputations=13854694 recall@100=0.9885 mdr=1.0003 epsRecall@100=1.0000 iters=1 beamWidth=100 numWorkers=2 buildMs=522.75 writeLockWaitMs=5.128 writeLockCount=97222 incomingWaitMs=0.000 incomingCount=0 effectiveConcurrency=1.962 workerThreads=2 blockedPct=0.00 runnableSamples=50 blockedSamples=0
+  iter 1/1 SIFT COMBINED n=20000 segs=2 del=0.0 beam=100 workers=2 wallMs=1369.74 dist=34879977
+RESULT label=smoke-parallel2 dataset=SIFT mergeMode=COMBINED vectorCount=20000 numSegments=2 deleteRatio=0.0 mergedSize=20000 wallMs=1369.74 distanceComputations=34879977 recall@100=0.9728 mdr=1.0006 epsRecall@100=0.9999 iters=1 beamWidth=100 numWorkers=2 buildMs=1358.67 writeLockWaitMs=0.000 writeLockCount=0 incomingWaitMs=8.444 incomingCount=105476 effectiveConcurrency=1.613 workerThreads=3 blockedPct=0.00 runnableSamples=129 blockedSamples=0
+  iter 1/1 SIFT SMART_MERGE n=20000 segs=2 del=0.0 beam=100 workers=4 wallMs=267.50 dist=13977473
+RESULT label=smoke-parallel2 dataset=SIFT mergeMode=SMART_MERGE vectorCount=20000 numSegments=2 deleteRatio=0.0 mergedSize=20000 wallMs=267.50 distanceComputations=13977473 recall@100=0.9885 mdr=1.0003 epsRecall@100=1.0000 iters=1 beamWidth=100 numWorkers=4 buildMs=260.94 writeLockWaitMs=8.216 writeLockCount=98707 incomingWaitMs=0.000 incomingCount=0 effectiveConcurrency=3.827 workerThreads=4 blockedPct=0.00 runnableSamples=47 blockedSamples=0
+  iter 1/1 SIFT COMBINED n=20000 segs=2 del=0.0 beam=100 workers=4 wallMs=800.45 dist=34847124
+RESULT label=smoke-parallel2 dataset=SIFT mergeMode=COMBINED vectorCount=20000 numSegments=2 deleteRatio=0.0 mergedSize=20000 wallMs=800.45 distanceComputations=34847124 recall@100=0.9735 mdr=1.0006 epsRecall@100=0.9999 iters=1 beamWidth=100 numWorkers=4 buildMs=794.74 writeLockWaitMs=0.000 writeLockCount=0 incomingWaitMs=10.393 incomingCount=106399 effectiveConcurrency=2.897 workerThreads=5 blockedPct=0.00 runnableSamples=148 blockedSamples=0

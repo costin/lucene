@@ -1,0 +1,14 @@
+WARNING: Using incubator modules: jdk.incubator.vector
+HnswMergeResearch label=quality-mdr-smoke datasets=RANDOM,SIFT vectorCounts=2000 segs=2 deletes=0.0 modes=SMART_MERGE mergeIters=1 rebuildIters=1
+CACHE miss dataset=RANDOM vectorCount=2000 numSegments=2 — building segment graphs
+  building segment 1/2 size=1200
+Sep 08, 2026 12:11:58 PM org.apache.lucene.internal.vectorization.PanamaVectorizationProvider logIncubatorSetup
+INFO: Java vector incubator API enabled; uses preferredBitSize=512; FMA enabled
+  building segment 2/2 size=800
+  iter 1/1 RANDOM SMART_MERGE n=2000 segs=2 del=0.0 wallMs=107.07 dist=1405051
+RESULT label=quality-mdr-smoke dataset=RANDOM mergeMode=SMART_MERGE vectorCount=2000 numSegments=2 deleteRatio=0.0 mergedSize=2000 wallMs=107.07 distanceComputations=1405051 recall@100=0.9561 mdr=1.0007 epsRecall@100=1.0000 iters=1
+CACHE miss dataset=SIFT vectorCount=2000 numSegments=2 — building segment graphs
+  building segment 1/2 size=1200
+  building segment 2/2 size=800
+  iter 1/1 SIFT SMART_MERGE n=2000 segs=2 del=0.0 wallMs=36.39 dist=492751
+RESULT label=quality-mdr-smoke dataset=SIFT mergeMode=SMART_MERGE vectorCount=2000 numSegments=2 deleteRatio=0.0 mergedSize=2000 wallMs=36.39 distanceComputations=492751 recall@100=0.9950 mdr=1.0001 epsRecall@100=1.0000 iters=1

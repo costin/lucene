@@ -1,0 +1,104 @@
+WARNING: Using incubator modules: jdk.incubator.vector
+HnswMergeResearch label=fgim datasets=RANDOM,SIFT vectorCounts=200000,512000 segs=2,5 deletes=0.0,0.2 modes=SMART_MERGE mergeIters=3 rebuildIters=1
+CACHE miss dataset=RANDOM vectorCount=200000 numSegments=2 — building segment graphs
+  building segment 1/2 size=120000
+Sep 08, 2026 9:26:04 AM org.apache.lucene.internal.vectorization.PanamaVectorizationProvider logIncubatorSetup
+INFO: Java vector incubator API enabled; uses preferredBitSize=512; FMA enabled
+  building segment 2/2 size=80000
+  iter 1/3 RANDOM SMART_MERGE n=200000 segs=2 del=0.0 wallMs=24257.44 dist=343193665
+  iter 2/3 RANDOM SMART_MERGE n=200000 segs=2 del=0.0 wallMs=25839.78 dist=343193665
+  iter 3/3 RANDOM SMART_MERGE n=200000 segs=2 del=0.0 wallMs=24634.62 dist=343193665
+RESULT label=fgim dataset=RANDOM mergeMode=SMART_MERGE vectorCount=200000 numSegments=2 deleteRatio=0.0 mergedSize=200000 wallMs=24910.61 distanceComputations=343193665 recall@100=0.2818 iters=3
+  iter 1/3 RANDOM SMART_MERGE n=200000 segs=2 del=0.2 wallMs=19906.43 dist=318120734
+  iter 2/3 RANDOM SMART_MERGE n=200000 segs=2 del=0.2 wallMs=19782.62 dist=318120734
+  iter 3/3 RANDOM SMART_MERGE n=200000 segs=2 del=0.2 wallMs=19591.33 dist=318120734
+RESULT label=fgim dataset=RANDOM mergeMode=SMART_MERGE vectorCount=200000 numSegments=2 deleteRatio=0.2 mergedSize=184081 wallMs=19760.13 distanceComputations=318120734 recall@100=0.2910 iters=3
+CACHE miss dataset=RANDOM vectorCount=200000 numSegments=5 — building segment graphs
+  building segment 1/5 size=120000
+  building segment 2/5 size=20000
+  building segment 3/5 size=20000
+  building segment 4/5 size=20000
+  building segment 5/5 size=20000
+  iter 1/3 RANDOM SMART_MERGE n=200000 segs=5 del=0.0 wallMs=28929.73 dist=388177954
+  iter 2/3 RANDOM SMART_MERGE n=200000 segs=5 del=0.0 wallMs=27373.75 dist=388177954
+  iter 3/3 RANDOM SMART_MERGE n=200000 segs=5 del=0.0 wallMs=27568.45 dist=388177954
+RESULT label=fgim dataset=RANDOM mergeMode=SMART_MERGE vectorCount=200000 numSegments=5 deleteRatio=0.0 mergedSize=200000 wallMs=27957.31 distanceComputations=388177954 recall@100=0.2753 iters=3
+  iter 1/3 RANDOM SMART_MERGE n=200000 segs=5 del=0.2 wallMs=19385.70 dist=318120734
+  iter 2/3 RANDOM SMART_MERGE n=200000 segs=5 del=0.2 wallMs=19778.63 dist=318120734
+  iter 3/3 RANDOM SMART_MERGE n=200000 segs=5 del=0.2 wallMs=19541.51 dist=318120734
+RESULT label=fgim dataset=RANDOM mergeMode=SMART_MERGE vectorCount=200000 numSegments=5 deleteRatio=0.2 mergedSize=184081 wallMs=19568.61 distanceComputations=318120734 recall@100=0.2910 iters=3
+CACHE miss dataset=RANDOM vectorCount=512000 numSegments=2 — building segment graphs
+  building segment 1/2 size=307200
+  building segment 2/2 size=204800
+  iter 1/3 RANDOM SMART_MERGE n=512000 segs=2 del=0.0 wallMs=78734.52 dist=904878030
+  iter 2/3 RANDOM SMART_MERGE n=512000 segs=2 del=0.0 wallMs=74718.56 dist=904878030
+  iter 3/3 RANDOM SMART_MERGE n=512000 segs=2 del=0.0 wallMs=74136.82 dist=904878030
+RESULT label=fgim dataset=RANDOM mergeMode=SMART_MERGE vectorCount=512000 numSegments=2 deleteRatio=0.0 mergedSize=512000 wallMs=75863.30 distanceComputations=904878030 recall@100=0.1793 iters=3
+  iter 1/3 RANDOM SMART_MERGE n=512000 segs=2 del=0.2 wallMs=63711.31 dist=839169255
+  iter 2/3 RANDOM SMART_MERGE n=512000 segs=2 del=0.2 wallMs=61777.84 dist=839169255
+  iter 3/3 RANDOM SMART_MERGE n=512000 segs=2 del=0.2 wallMs=61010.65 dist=839169255
+RESULT label=fgim dataset=RANDOM mergeMode=SMART_MERGE vectorCount=512000 numSegments=2 deleteRatio=0.2 mergedSize=471107 wallMs=62166.60 distanceComputations=839169255 recall@100=0.1856 iters=3
+CACHE miss dataset=RANDOM vectorCount=512000 numSegments=5 — building segment graphs
+  building segment 1/5 size=307200
+  building segment 2/5 size=51200
+  building segment 3/5 size=51200
+  building segment 4/5 size=51200
+  building segment 5/5 size=51200
+  iter 1/3 RANDOM SMART_MERGE n=512000 segs=5 del=0.0 wallMs=89143.17 dist=1024221586
+  iter 2/3 RANDOM SMART_MERGE n=512000 segs=5 del=0.0 wallMs=89798.23 dist=1024221586
+  iter 3/3 RANDOM SMART_MERGE n=512000 segs=5 del=0.0 wallMs=93666.75 dist=1024221586
+RESULT label=fgim dataset=RANDOM mergeMode=SMART_MERGE vectorCount=512000 numSegments=5 deleteRatio=0.0 mergedSize=512000 wallMs=90869.38 distanceComputations=1024221586 recall@100=0.1821 iters=3
+  iter 1/3 RANDOM SMART_MERGE n=512000 segs=5 del=0.2 wallMs=65866.90 dist=839169255
+  iter 2/3 RANDOM SMART_MERGE n=512000 segs=5 del=0.2 wallMs=64307.94 dist=839169255
+  iter 3/3 RANDOM SMART_MERGE n=512000 segs=5 del=0.2 wallMs=61189.72 dist=839169255
+RESULT label=fgim dataset=RANDOM mergeMode=SMART_MERGE vectorCount=512000 numSegments=5 deleteRatio=0.2 mergedSize=471107 wallMs=63788.19 distanceComputations=839169255 recall@100=0.1856 iters=3
+CACHE miss dataset=SIFT vectorCount=200000 numSegments=2 — building segment graphs
+  building segment 1/2 size=120000
+  building segment 2/2 size=80000
+  iter 1/3 SIFT SMART_MERGE n=200000 segs=2 del=0.0 wallMs=13424.44 dist=141342646
+  iter 2/3 SIFT SMART_MERGE n=200000 segs=2 del=0.0 wallMs=12634.00 dist=141342646
+  iter 3/3 SIFT SMART_MERGE n=200000 segs=2 del=0.0 wallMs=12116.78 dist=141342646
+RESULT label=fgim dataset=SIFT mergeMode=SMART_MERGE vectorCount=200000 numSegments=2 deleteRatio=0.0 mergedSize=200000 wallMs=12725.07 distanceComputations=141342646 recall@100=0.9570 iters=3
+  iter 1/3 SIFT SMART_MERGE n=200000 segs=2 del=0.2 wallMs=10241.95 dist=141074013
+  iter 2/3 SIFT SMART_MERGE n=200000 segs=2 del=0.2 wallMs=10507.12 dist=141074013
+  iter 3/3 SIFT SMART_MERGE n=200000 segs=2 del=0.2 wallMs=10763.73 dist=141074013
+RESULT label=fgim dataset=SIFT mergeMode=SMART_MERGE vectorCount=200000 numSegments=2 deleteRatio=0.2 mergedSize=184081 wallMs=10504.26 distanceComputations=141074013 recall@100=0.9633 iters=3
+CACHE miss dataset=SIFT vectorCount=200000 numSegments=5 — building segment graphs
+  building segment 1/5 size=120000
+  building segment 2/5 size=20000
+  building segment 3/5 size=20000
+  building segment 4/5 size=20000
+  building segment 5/5 size=20000
+  iter 1/3 SIFT SMART_MERGE n=200000 segs=5 del=0.0 wallMs=16607.81 dist=173876772
+  iter 2/3 SIFT SMART_MERGE n=200000 segs=5 del=0.0 wallMs=15551.23 dist=173876772
+  iter 3/3 SIFT SMART_MERGE n=200000 segs=5 del=0.0 wallMs=15855.27 dist=173876772
+RESULT label=fgim dataset=SIFT mergeMode=SMART_MERGE vectorCount=200000 numSegments=5 deleteRatio=0.0 mergedSize=200000 wallMs=16004.77 distanceComputations=173876772 recall@100=0.9557 iters=3
+  iter 1/3 SIFT SMART_MERGE n=200000 segs=5 del=0.2 wallMs=10758.76 dist=141074013
+  iter 2/3 SIFT SMART_MERGE n=200000 segs=5 del=0.2 wallMs=10785.29 dist=141074013
+  iter 3/3 SIFT SMART_MERGE n=200000 segs=5 del=0.2 wallMs=10901.20 dist=141074013
+RESULT label=fgim dataset=SIFT mergeMode=SMART_MERGE vectorCount=200000 numSegments=5 deleteRatio=0.2 mergedSize=184081 wallMs=10815.08 distanceComputations=141074013 recall@100=0.9633 iters=3
+CACHE miss dataset=SIFT vectorCount=512000 numSegments=2 — building segment graphs
+  building segment 1/2 size=307200
+  building segment 2/2 size=204800
+  iter 1/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 wallMs=42148.72 dist=383720109
+  iter 2/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 wallMs=42363.99 dist=383720109
+  iter 3/3 SIFT SMART_MERGE n=512000 segs=2 del=0.0 wallMs=41091.73 dist=383720109
+RESULT label=fgim dataset=SIFT mergeMode=SMART_MERGE vectorCount=512000 numSegments=2 deleteRatio=0.0 mergedSize=512000 wallMs=41868.15 distanceComputations=383720109 recall@100=0.9339 iters=3
+  iter 1/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 wallMs=34577.60 dist=381583074
+  iter 2/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 wallMs=35688.18 dist=381583074
+  iter 3/3 SIFT SMART_MERGE n=512000 segs=2 del=0.2 wallMs=36288.55 dist=381583074
+RESULT label=fgim dataset=SIFT mergeMode=SMART_MERGE vectorCount=512000 numSegments=2 deleteRatio=0.2 mergedSize=471107 wallMs=35518.11 distanceComputations=381583074 recall@100=0.9466 iters=3
+CACHE miss dataset=SIFT vectorCount=512000 numSegments=5 — building segment graphs
+  building segment 1/5 size=307200
+  building segment 2/5 size=51200
+  building segment 3/5 size=51200
+  building segment 4/5 size=51200
+  building segment 5/5 size=51200
+  iter 1/3 SIFT SMART_MERGE n=512000 segs=5 del=0.0 wallMs=54144.64 dist=472639220
+  iter 2/3 SIFT SMART_MERGE n=512000 segs=5 del=0.0 wallMs=51914.28 dist=472639220
+  iter 3/3 SIFT SMART_MERGE n=512000 segs=5 del=0.0 wallMs=51336.91 dist=472639220
+RESULT label=fgim dataset=SIFT mergeMode=SMART_MERGE vectorCount=512000 numSegments=5 deleteRatio=0.0 mergedSize=512000 wallMs=52465.28 distanceComputations=472639220 recall@100=0.9355 iters=3
+  iter 1/3 SIFT SMART_MERGE n=512000 segs=5 del=0.2 wallMs=34438.37 dist=381583074
+  iter 2/3 SIFT SMART_MERGE n=512000 segs=5 del=0.2 wallMs=34440.99 dist=381583074
+  iter 3/3 SIFT SMART_MERGE n=512000 segs=5 del=0.2 wallMs=34209.04 dist=381583074
+RESULT label=fgim dataset=SIFT mergeMode=SMART_MERGE vectorCount=512000 numSegments=5 deleteRatio=0.2 mergedSize=471107 wallMs=34362.80 distanceComputations=381583074 recall@100=0.9466 iters=3

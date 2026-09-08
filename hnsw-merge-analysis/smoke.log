@@ -1,0 +1,26 @@
+WARNING: Using incubator modules: jdk.incubator.vector
+HnswMergeResearch label=smoke datasets=RANDOM,SIFT vectorCounts=2000 segs=2 deletes=0.0,0.2 modes=FULL_REBUILD,SMART_MERGE mergeIters=1 rebuildIters=1
+CACHE miss dataset=RANDOM vectorCount=2000 numSegments=2 — building segment graphs
+  building segment 1/2 size=1200
+Sep 08, 2026 7:26:28 AM org.apache.lucene.internal.vectorization.PanamaVectorizationProvider logIncubatorSetup
+INFO: Java vector incubator API enabled; uses preferredBitSize=512; FMA enabled
+  building segment 2/2 size=800
+  iter 1/1 RANDOM FULL_REBUILD n=2000 segs=2 del=0.0 wallMs=227.70 dist=3444192
+RESULT label=smoke dataset=RANDOM mergeMode=FULL_REBUILD vectorCount=2000 numSegments=2 deleteRatio=0.0 mergedSize=2000 wallMs=227.70 distanceComputations=3444192 recall@100=0.9640 iters=1
+  iter 1/1 RANDOM SMART_MERGE n=2000 segs=2 del=0.0 wallMs=125.83 dist=1405051
+RESULT label=smoke dataset=RANDOM mergeMode=SMART_MERGE vectorCount=2000 numSegments=2 deleteRatio=0.0 mergedSize=2000 wallMs=125.83 distanceComputations=1405051 recall@100=0.9561 iters=1
+  iter 1/1 RANDOM FULL_REBUILD n=2000 segs=2 del=0.2 wallMs=148.65 dist=3031257
+RESULT label=smoke dataset=RANDOM mergeMode=FULL_REBUILD vectorCount=2000 numSegments=2 deleteRatio=0.2 mergedSize=1836 wallMs=148.65 distanceComputations=3031257 recall@100=0.9700 iters=1
+  iter 1/1 RANDOM SMART_MERGE n=2000 segs=2 del=0.2 wallMs=72.15 dist=1509282
+RESULT label=smoke dataset=RANDOM mergeMode=SMART_MERGE vectorCount=2000 numSegments=2 deleteRatio=0.2 mergedSize=1836 wallMs=72.15 distanceComputations=1509282 recall@100=0.9708 iters=1
+CACHE miss dataset=SIFT vectorCount=2000 numSegments=2 — building segment graphs
+  building segment 1/2 size=1200
+  building segment 2/2 size=800
+  iter 1/1 SIFT FULL_REBUILD n=2000 segs=2 del=0.0 wallMs=100.61 dist=1433840
+RESULT label=smoke dataset=SIFT mergeMode=FULL_REBUILD vectorCount=2000 numSegments=2 deleteRatio=0.0 mergedSize=2000 wallMs=100.61 distanceComputations=1433840 recall@100=0.9958 iters=1
+  iter 1/1 SIFT SMART_MERGE n=2000 segs=2 del=0.0 wallMs=40.44 dist=492751
+RESULT label=smoke dataset=SIFT mergeMode=SMART_MERGE vectorCount=2000 numSegments=2 deleteRatio=0.0 mergedSize=2000 wallMs=40.44 distanceComputations=492751 recall@100=0.9950 iters=1
+  iter 1/1 SIFT FULL_REBUILD n=2000 segs=2 del=0.2 wallMs=86.58 dist=1274218
+RESULT label=smoke dataset=SIFT mergeMode=FULL_REBUILD vectorCount=2000 numSegments=2 deleteRatio=0.2 mergedSize=1836 wallMs=86.58 distanceComputations=1274218 recall@100=0.9965 iters=1
+  iter 1/1 SIFT SMART_MERGE n=2000 segs=2 del=0.2 wallMs=40.93 dist=579707
+RESULT label=smoke dataset=SIFT mergeMode=SMART_MERGE vectorCount=2000 numSegments=2 deleteRatio=0.2 mergedSize=1836 wallMs=40.93 distanceComputations=579707 recall@100=0.9967 iters=1
