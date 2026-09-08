@@ -86,6 +86,12 @@ public class HnswGraphBuilder implements HnswBuilder {
   protected boolean frozen;
 
   /**
+   * When true, {@link #addDiverseNeighbors} adds only forward links. Used during merge; a later
+   * repair pass restores backward edges. Default false so a full rebuild is unchanged.
+   */
+  protected boolean lazyBackwardConnect;
+
+  /**
    * Merge-level start time in nanoseconds. When set, the periodic progress prints (every 10K
    * vectors) show elapsed time since the overall merge began rather than since the current chunk
    * began. A value of -1 means not set (non-concurrent path).
@@ -397,6 +403,10 @@ public class HnswGraphBuilder implements HnswBuilder {
     int maxConnOnLevel = level == 0 ? M * 2 : M;
     boolean[] mask =
         selectAndLinkDiverse(node, neighbors, candidates, maxConnOnLevel, scorer, isLinkRepair);
+
+    if (lazyBackwardConnect) {
+      return;
+    }
 
     // Link the selected nodes to the new node, and the new node to the selected nodes (again
     // applying diversity heuristic)

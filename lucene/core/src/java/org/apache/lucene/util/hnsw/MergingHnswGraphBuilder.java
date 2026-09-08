@@ -55,9 +55,29 @@ import org.apache.lucene.util.BitSet;
  * @lucene.experimental
  */
 public final class MergingHnswGraphBuilder extends HnswGraphBuilder {
+  /**
+   * Repair after a lazy (forward-only) merge. {@code LIGHT} only symmetrizes existing forward edges
+   * where the reverse side has room. {@code THOROUGH} also runs a diversity-aware local search on
+   * underfull level-0 nodes. Override with {@code -Dhnsw.lazy.repair=thorough}.
+   */
+  public enum LazyRepairMode {
+    LIGHT,
+    THOROUGH
+  }
+
+  public static volatile LazyRepairMode lazyRepairMode = parseRepairMode();
+
   private final HnswGraph[] graphs;
   private final int[][] ordMaps;
   private final BitSet initializedNodes;
+
+  private static LazyRepairMode parseRepairMode() {
+    String p = System.getProperty("hnsw.lazy.repair", "light");
+    if (p != null && p.equalsIgnoreCase("thorough")) {
+      return LazyRepairMode.THOROUGH;
+    }
+    return LazyRepairMode.LIGHT;
+  }
 
   private MergingHnswGraphBuilder(
       RandomVectorScorerSupplier scorerSupplier,
@@ -98,6 +118,9 @@ public final class MergingHnswGraphBuilder extends HnswGraphBuilder {
       int totalNumberOfVectors,
       BitSet initializedNodes)
       throws IOException {
+    if (graphs == null || graphs.length == 0 || graphs[0] == null || graphs[0].size() == 0) {
+      throw new IllegalArgumentException("graphs[0] must be a non-empty base graph");
+    }
     OnHeapHnswGraph graph =
         InitializedHnswGraphBuilder.initGraph(
             graphs[0], ordMaps[0], totalNumberOfVectors, beamWidth, scorerSupplier);
@@ -124,8 +147,11 @@ public final class MergingHnswGraphBuilder extends HnswGraphBuilder {
               + " vectors, graph sizes:"
               + graphSizes);
     }
+    lazyBackwardConnect = true;
     for (int i = 1; i < graphs.length; i++) {
-      updateGraph(graphs[i], ordMaps[i]);
+      if (graphs[i] != null && graphs[i].size() > 0) {
+        updateGraph(graphs[i], ordMaps[i]);
+      }
     }
 
     if (initializedNodes != null && maxOrd > 0) {
@@ -138,6 +164,8 @@ public final class MergingHnswGraphBuilder extends HnswGraphBuilder {
         addGraphNode(node);
       }
     }
+    lazyBackwardConnect = false;
+    repairBackwardLinks(maxOrd);
 
     return getCompletedGraph();
   }
@@ -145,6 +173,9 @@ public final class MergingHnswGraphBuilder extends HnswGraphBuilder {
   /** Merge the smaller graph into the current larger graph. */
   private void updateGraph(HnswGraph gS, int[] ordMapS) throws IOException {
     int size = gS.size();
+    if (size == 0) {
+      return;
+    }
     IntHashSet j = UpdateGraphsUtils.computeJoinSet(gS);
 
     // add nodes in the join set directly to the graph
@@ -152,7 +183,10 @@ public final class MergingHnswGraphBuilder extends HnswGraphBuilder {
     int[] nodes = j.toArray();
     Arrays.sort(nodes);
     for (int node : nodes) {
-      addGraphNode(ordMapS[node]);
+      int mapped = mapOrd(ordMapS, node);
+      if (mapped >= 0) {
+        addGraphNode(mapped);
+      }
     }
 
     // for each node outside of j set:
@@ -163,13 +197,20 @@ public final class MergingHnswGraphBuilder extends HnswGraphBuilder {
       if (j.contains(u)) {
         continue;
       }
+      int mapped = mapOrd(ordMapS, u);
+      if (mapped < 0) {
+        continue;
+      }
       IntHashSet eps = new IntHashSet();
       gS.seek(0, u);
       for (int v = gS.nextNeighbor(); v != NO_MORE_DOCS; v = gS.nextNeighbor()) {
         // if u's neighbour v is in the join set, or already added to gL (v < u),
         // then we add v's neighbours from gL to the candidate list
         if (v < u || j.contains(v)) {
-          int newv = ordMapS[v];
+          int newv = mapOrd(ordMapS, v);
+          if (newv < 0) {
+            continue;
+          }
           eps.add(newv);
 
           hnsw.seek(0, newv);
@@ -179,7 +220,82 @@ public final class MergingHnswGraphBuilder extends HnswGraphBuilder {
           }
         }
       }
-      addGraphNode(ordMapS[u], eps);
+      addGraphNode(mapped, eps);
     }
+  }
+
+  private void repairBackwardLinks(int maxOrd) throws IOException {
+    if (maxOrd <= 0) {
+      return;
+    }
+    if (lazyRepairMode == LazyRepairMode.THOROUGH) {
+      thoroughRepair(maxOrd);
+    }
+    lightRepair(maxOrd);
+  }
+
+  /** Symmetrize level-0 forward edges where the reverse side has room. No diversity check. */
+  private void lightRepair(int maxOrd) throws IOException {
+    int maxConn0 = M * 2;
+    for (int u = 0; u < maxOrd; u++) {
+      NeighborArray nu = hnsw.getNeighbors(0, u);
+      int[] uNodes = nu.nodes();
+      for (int i = 0; i < nu.size(); i++) {
+        int v = uNodes[i];
+        if (v < 0 || v >= maxOrd || v == u) {
+          continue;
+        }
+        NeighborArray nv = hnsw.getNeighbors(0, v);
+        if (nv.size() >= maxConn0 || containsNode(nv, u)) {
+          continue;
+        }
+        nv.addOutOfOrder(u, nu.getScores(i));
+      }
+    }
+  }
+
+  /**
+   * For level-0 nodes with unused neighbour slots, search from the current neighbourhood and add
+   * diversity-aware links (including reverse, since {@code lazyBackwardConnect} is off).
+   */
+  private void thoroughRepair(int maxOrd) throws IOException {
+    int maxConn0 = M * 2;
+    for (int node = 0; node < maxOrd; node++) {
+      NeighborArray neighbors = hnsw.getNeighbors(0, node);
+      if (neighbors.size() >= maxConn0) {
+        continue;
+      }
+      scorer.setScoringOrdinal(node);
+      int[] eps;
+      if (neighbors.size() > 0) {
+        eps = Arrays.copyOf(neighbors.nodes(), neighbors.size());
+      } else if (hnsw.entryNode() >= 0) {
+        eps = new int[] {hnsw.entryNode()};
+      } else {
+        continue;
+      }
+      beamCandidates.clear();
+      graphSearcher.searchLevel(beamCandidates, scorer, 0, eps, hnsw, null);
+      NeighborArray scratch = new NeighborArray(Math.max(beamCandidates.k(), M + 1), false);
+      popToScratch(beamCandidates, scratch);
+      addDiverseNeighbors(0, node, scratch, scorer, true);
+    }
+  }
+
+  private static boolean containsNode(NeighborArray arr, int node) {
+    int[] nodes = arr.nodes();
+    for (int i = 0; i < arr.size(); i++) {
+      if (nodes[i] == node) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private static int mapOrd(int[] ordMap, int oldOrd) {
+    if (oldOrd < 0 || oldOrd >= ordMap.length) {
+      return -1;
+    }
+    return ordMap[oldOrd];
   }
 }
