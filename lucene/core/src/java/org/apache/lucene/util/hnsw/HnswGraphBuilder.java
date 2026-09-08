@@ -86,6 +86,15 @@ public class HnswGraphBuilder implements HnswBuilder {
   protected boolean frozen;
 
   /**
+   * When true, {@link #addGraphNodeInternal} records the level-0 search result so a subsequent
+   * insertion can warm-start from it (IGTM). Off by default so a full rebuild is unchanged.
+   */
+  protected boolean captureLevel0SearchResult;
+
+  /** Level-0 search result of the most recent insertion, in merged-graph ordinals. */
+  protected IntHashSet lastLevel0SearchResult;
+
+  /**
    * Merge-level start time in nanoseconds. When set, the periodic progress prints (every 10K
    * vectors) show elapsed time since the overall merge began rather than since the current chunk
    * began. A value of -1 means not set (non-concurrent path).
@@ -327,6 +336,12 @@ public class HnswGraphBuilder implements HnswBuilder {
         }
         graphSearcher.searchLevel(candidates, scorer, level, eps, hnsw, null);
         eps = candidates.popUntilNearestKNodes();
+        if (captureLevel0SearchResult && level == 0) {
+          lastLevel0SearchResult = new IntHashSet(eps.length);
+          for (int ep : eps) {
+            lastLevel0SearchResult.add(ep);
+          }
+        }
         scratchPerLevel[i] = new NeighborArray(Math.max(candidates.k(), M + 1), false);
         popToScratch(candidates, scratchPerLevel[i]);
       }

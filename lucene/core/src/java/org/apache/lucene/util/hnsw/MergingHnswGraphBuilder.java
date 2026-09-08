@@ -72,6 +72,9 @@ public final class MergingHnswGraphBuilder extends HnswGraphBuilder {
     this.graphs = graphs;
     this.ordMaps = ordMaps;
     this.initializedNodes = initializedNodes;
+    // IGTM warm-start: consecutive insertions from the same source graph reuse the previous
+    // node's level-0 search result as entry points.
+    this.captureLevel0SearchResult = true;
   }
 
   /**
@@ -98,6 +101,9 @@ public final class MergingHnswGraphBuilder extends HnswGraphBuilder {
       int totalNumberOfVectors,
       BitSet initializedNodes)
       throws IOException {
+    if (graphs == null || graphs.length == 0 || graphs[0] == null || graphs[0].size() == 0) {
+      throw new IllegalArgumentException("graphs[0] must be a non-empty base graph");
+    }
     OnHeapHnswGraph graph =
         InitializedHnswGraphBuilder.initGraph(
             graphs[0], ordMaps[0], totalNumberOfVectors, beamWidth, scorerSupplier);
@@ -125,7 +131,9 @@ public final class MergingHnswGraphBuilder extends HnswGraphBuilder {
               + graphSizes);
     }
     for (int i = 1; i < graphs.length; i++) {
-      updateGraph(graphs[i], ordMaps[i]);
+      if (graphs[i] != null && graphs[i].size() > 0) {
+        updateGraph(graphs[i], ordMaps[i]);
+      }
     }
 
     if (initializedNodes != null && maxOrd > 0) {
@@ -145,41 +153,75 @@ public final class MergingHnswGraphBuilder extends HnswGraphBuilder {
   /** Merge the smaller graph into the current larger graph. */
   private void updateGraph(HnswGraph gS, int[] ordMapS) throws IOException {
     int size = gS.size();
+    if (size == 0) {
+      return;
+    }
     IntHashSet j = UpdateGraphsUtils.computeJoinSet(gS);
 
-    // add nodes in the join set directly to the graph
-    // sort for stability
+    // Join-set nodes use a full search; do not treat their result as an IGTM warm-start.
+    captureLevel0SearchResult = false;
     int[] nodes = j.toArray();
     Arrays.sort(nodes);
     for (int node : nodes) {
-      addGraphNode(ordMapS[node]);
+      int mapped = mapOrd(ordMapS, node);
+      if (mapped >= 0) {
+        addGraphNode(mapped);
+      }
     }
 
-    // for each node outside of j set:
-    // form the entry points set for the node
-    // by joining the node's neighbours in gS with
-    // the node's neighbours' neighbours in gL
+    // IGTM: consecutive non-join nodes are spatially near in gS, so the previous
+    // insertion's level-0 result is a good warm-start. Fall back to neighbour-of-
+    // neighbour only for the first non-join node (no previous result yet).
+    captureLevel0SearchResult = true;
+    lastLevel0SearchResult = null;
+
     for (int u = 0; u < size; u++) {
       if (j.contains(u)) {
         continue;
       }
-      IntHashSet eps = new IntHashSet();
-      gS.seek(0, u);
-      for (int v = gS.nextNeighbor(); v != NO_MORE_DOCS; v = gS.nextNeighbor()) {
-        // if u's neighbour v is in the join set, or already added to gL (v < u),
-        // then we add v's neighbours from gL to the candidate list
-        if (v < u || j.contains(v)) {
-          int newv = ordMapS[v];
-          eps.add(newv);
+      int mapped = mapOrd(ordMapS, u);
+      if (mapped < 0) {
+        continue;
+      }
+      IntHashSet eps;
+      if (lastLevel0SearchResult != null && lastLevel0SearchResult.size() > 0) {
+        eps = lastLevel0SearchResult;
+      } else {
+        eps = neighborOfNeighborEps(gS, ordMapS, u, j);
+      }
+      addGraphNode(mapped, eps);
+    }
+  }
 
-          hnsw.seek(0, newv);
-          int friendOrd;
-          while ((friendOrd = hnsw.nextNeighbor()) != NO_MORE_DOCS) {
-            eps.add(friendOrd);
-          }
+  /** Production neighbour-of-neighbour entry points, skipping deleted ordinals ({@code -1}). */
+  private IntHashSet neighborOfNeighborEps(HnswGraph gS, int[] ordMapS, int u, IntHashSet join)
+      throws IOException {
+    IntHashSet eps = new IntHashSet();
+    gS.seek(0, u);
+    for (int v = gS.nextNeighbor(); v != NO_MORE_DOCS; v = gS.nextNeighbor()) {
+      // if u's neighbour v is in the join set, or already added to gL (v < u),
+      // then we add v's neighbours from gL to the candidate list
+      if (v < u || join.contains(v)) {
+        int newv = mapOrd(ordMapS, v);
+        if (newv < 0) {
+          continue;
+        }
+        eps.add(newv);
+
+        hnsw.seek(0, newv);
+        int friendOrd;
+        while ((friendOrd = hnsw.nextNeighbor()) != NO_MORE_DOCS) {
+          eps.add(friendOrd);
         }
       }
-      addGraphNode(ordMapS[u], eps);
     }
+    return eps;
+  }
+
+  private static int mapOrd(int[] ordMap, int oldOrd) {
+    if (oldOrd < 0 || oldOrd >= ordMap.length) {
+      return -1;
+    }
+    return ordMap[oldOrd];
   }
 }
