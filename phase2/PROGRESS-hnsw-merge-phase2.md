@@ -9,31 +9,35 @@ Updated ~hourly while the experiment runs. Final `RESULTS-hnsw-merge-phase2.md` 
 |---|---|---|
 | 16:55 | Setup | Loop launched. |
 | 17:58 | A+B done; C running | All variants implemented + `[VERIFY]` counters live. SIFT 512k done. |
-| 19:04 | C running | SIFT **1M** (2 & 5 seg) done; **HFEMB 200k** (clustered real embeddings) done; **HFEMB 2M** running. 51 result rows. |
+| 19:04 | C running | SIFT 1M (2 & 5 seg) + HFEMB 200k (clustered) done. |
+| 20:06 | C running | **HFEMB 2M** underway (deleteRatio=0.0 done; 0.2 + FGIM-at-2M pending). 2M merge ≈ 6.4 min single-thread / 2.2 min @ 8w. |
 
-## Non-base repair holds across scale AND clustered data (single-thread)
+## Headline: non-base repair — consistent ~34% distance cut (single-thread), recall preserved
 
-**SIFT 1M, 5 segments, deleteRatio=0.2** (multi-segment deletes, ES-realistic):
-| variant | dist comps | wall @1w | recall@100 |
-|---|---:|---:|---:|
-| SMART_MERGE | 762.7M | 93.8 s | 0.9343 |
-| **NON_BASE_REPAIR** | **498.8M (−35%)** | **62.2 s (−34%)** | 0.9238 |
+| config | baseline dist | repair dist | Δ | recall (base→repair) |
+|---|---:|---:|---:|---:|
+| SIFT 512k, 2 seg, 20% del | 381.6M | 251.1M | −34% | 0.9466 → 0.9475 |
+| SIFT 1M, 5 seg, 20% del | 762.7M | 498.8M | −35% | 0.9343 → 0.9238 |
+| HFEMB 200k (clustered), 20% del | 137.5M | 90.6M | −34% | 0.9742 → 0.9728 |
 
-**HFEMB 200k, deleteRatio=0.2** (clustered real embeddings — repair-quality test):
-| variant | dist comps | wall @1w | recall@100 |
-|---|---:|---:|---:|
-| SMART_MERGE | 137.5M | 20.0 s | 0.9742 |
-| **NON_BASE_REPAIR** | **90.6M (−34%)** | **14.6 s (−27%)** | 0.9728 |
+Holds across scale and on clustered real embeddings, with recall essentially preserved.
 
-Repair delivers a consistent **~34–35% distance reduction with recall preserved** on both SIFT and clustered embeddings — the concern that repair might degrade on clustered data does **not** materialize.
+## HFEMB 2M scale point (deleteRatio=0.0 so far)
+| variant | workers | dist | wall | recall@100 |
+|---|---:|---:|---:|---:|
+| SMART_MERGE | 1 | 1.35B | 384.7 s | 0.9604 |
+| REPAIR | 1 | 1.35B | 380.3 s | 0.9604 |
+| SMART_MERGE | 8 | 2.03B | 129.5 s | 0.9703 |
+| REPAIR | 8 | 2.04B | 122.5 s | 0.9705 |
 
-## Important gap found: repair not yet wired into the concurrent path
-At **8 workers**, REPAIR ≈ SMART_MERGE (e.g. SIFT 1M/5seg/0.2: both ~763M dist, ~34 s). The non-base repair currently engages only on the single-threaded `IncrementalHnswGraphMerger` path; `ConcurrentHnswMerger` falls back to baseline. **Wiring repair into the concurrent merger is the key follow-up** — it should carry the single-thread −34% distance win into the parallel path (and directly attack the Phase-1 delete-scaling gap).
+At 0% deletes REPAIR == baseline (expected). The **2M / 20% deletes** point — where repair should help — and **FGIM at 2M** (the "does cross-query pay off at scale" test) are still running.
+
+## Open gap (unchanged): repair not yet wired into the concurrent path
+At 8 workers REPAIR ≈ baseline; the non-base repair engages only on the single-threaded merger, while `ConcurrentHnswMerger` falls back to baseline (RESULTS notes "concurrent insert set unchanged"). **Wiring repair into the concurrent merger is the key follow-up** to carry the −34% into the parallel path.
 
 ## Other reads
-- **IGTM_FIXED**: consistently ≈ baseline (SIFT 1M/2/0.0: 598M vs 623M dist, ~equal recall, ~equal/slower wall) — confirms it is a subset of Lucene's existing own-neighbor + neighbor-of-neighbor seeding. Full argument in RESULTS.
-- **REPAIR @ deleteRatio=0.0 == SMART_MERGE exactly** (no repairable graphs) — sanity holds.
-- HFEMB recall ~0.974 (real embeddings, discriminative).
+- **IGTM_FIXED** ≈ baseline everywhere (a subset of Lucene's existing own-neighbor + neighbor-of-neighbor seeding; argument documented in RESULTS).
+- REPAIR == baseline exactly at 0% deletes (sanity).
 
 ## Next
-HFEMB **2M** scale test (does FGIM's cross-query advantage finally appear at 2M? does repair hold at 2M?), then Phase D write-up. _Next update in ~1h._
+Finish HFEMB 2M (deletes + FGIM-at-scale), Lazy at scale, then Phase D. _Next update in ~1h._
