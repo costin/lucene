@@ -22,6 +22,10 @@ import static org.apache.lucene.search.DocIdSetIterator.NO_MORE_DOCS;
 import java.io.IOException;
 import java.util.Arrays;
 import org.apache.lucene.internal.hppc.IntHashSet;
+import org.apache.lucene.search.KnnCollector;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.TopKnnCollector;
 import org.apache.lucene.util.BitSet;
 
 /**
@@ -58,6 +62,7 @@ public final class MergingHnswGraphBuilder extends HnswGraphBuilder {
   private final HnswGraph[] graphs;
   private final int[][] ordMaps;
   private final BitSet initializedNodes;
+  private RemappingVectorScorer[] remappers;
 
   private MergingHnswGraphBuilder(
       RandomVectorScorerSupplier scorerSupplier,
@@ -85,7 +90,7 @@ public final class MergingHnswGraphBuilder extends HnswGraphBuilder {
    * @param totalNumberOfVectors the total number of vectors in the new graph, this should include
    *     all vectors expected to be added to the graph in the future
    * @param initializedNodes the nodes will be initialized through the merging, if null, all nodes
-   *     should be already initialized after {@link #updateGraph(HnswGraph, int[])} being called
+   *     should be already initialized after the source graphs have been merged
    * @return a new HnswGraphBuilder that is initialized with the provided HnswGraph
    * @throws IOException when reading the graph fails
    */
@@ -98,6 +103,9 @@ public final class MergingHnswGraphBuilder extends HnswGraphBuilder {
       int totalNumberOfVectors,
       BitSet initializedNodes)
       throws IOException {
+    if (graphs == null || graphs.length == 0 || graphs[0] == null || graphs[0].size() == 0) {
+      throw new IllegalArgumentException("graphs[0] must be a non-empty base graph");
+    }
     OnHeapHnswGraph graph =
         InitializedHnswGraphBuilder.initGraph(
             graphs[0], ordMaps[0], totalNumberOfVectors, beamWidth, scorerSupplier);
@@ -125,7 +133,9 @@ public final class MergingHnswGraphBuilder extends HnswGraphBuilder {
               + graphSizes);
     }
     for (int i = 1; i < graphs.length; i++) {
-      updateGraph(graphs[i], ordMaps[i]);
+      if (graphs[i] != null && graphs[i].size() > 0) {
+        updateGraph(i);
+      }
     }
 
     if (initializedNodes != null && maxOrd > 0) {
@@ -142,44 +152,110 @@ public final class MergingHnswGraphBuilder extends HnswGraphBuilder {
     return getCompletedGraph();
   }
 
-  /** Merge the smaller graph into the current larger graph. */
-  private void updateGraph(HnswGraph gS, int[] ordMapS) throws IOException {
+  /**
+   * Merge {@code graphs[graphIndex]} into the current larger graph. {@code graphIndex} is the
+   * source being inserted; graphs {@code [0, graphIndex)} are already fully present in the merged
+   * graph and may be cross-queried (FGIM Phase 1).
+   */
+  private void updateGraph(int graphIndex) throws IOException {
+    HnswGraph gS = graphs[graphIndex];
+    int[] ordMapS = ordMaps[graphIndex];
     int size = gS.size();
+    if (size == 0) {
+      return;
+    }
     IntHashSet j = UpdateGraphsUtils.computeJoinSet(gS);
 
-    // add nodes in the join set directly to the graph
-    // sort for stability
+    // Join-set: full hierarchical search (do not pass eps0 — that would shrink the beam).
     int[] nodes = j.toArray();
     Arrays.sort(nodes);
     for (int node : nodes) {
-      addGraphNode(ordMapS[node]);
+      int mapped = mapOrd(ordMapS, node);
+      if (mapped >= 0) {
+        addGraphNode(mapped);
+      }
     }
 
-    // for each node outside of j set:
-    // form the entry points set for the node
-    // by joining the node's neighbours in gS with
-    // the node's neighbours' neighbours in gL
     for (int u = 0; u < size; u++) {
       if (j.contains(u)) {
         continue;
       }
-      IntHashSet eps = new IntHashSet();
-      gS.seek(0, u);
-      for (int v = gS.nextNeighbor(); v != NO_MORE_DOCS; v = gS.nextNeighbor()) {
-        // if u's neighbour v is in the join set, or already added to gL (v < u),
-        // then we add v's neighbours from gL to the candidate list
-        if (v < u || j.contains(v)) {
-          int newv = ordMapS[v];
-          eps.add(newv);
+      int mapped = mapOrd(ordMapS, u);
+      if (mapped < 0) {
+        continue;
+      }
+      IntHashSet eps = neighborOfNeighborEps(gS, ordMapS, u, j);
+      addCrossQueryEps(eps, mapped, graphIndex);
+      addGraphNode(mapped, eps);
+    }
+  }
 
-          hnsw.seek(0, newv);
-          int friendOrd;
-          while ((friendOrd = hnsw.nextNeighbor()) != NO_MORE_DOCS) {
-            eps.add(friendOrd);
-          }
+  /** Production neighbour-of-neighbour entry points, skipping deleted ordinals ({@code -1}). */
+  private IntHashSet neighborOfNeighborEps(HnswGraph gS, int[] ordMapS, int u, IntHashSet join)
+      throws IOException {
+    IntHashSet eps = new IntHashSet();
+    gS.seek(0, u);
+    for (int v = gS.nextNeighbor(); v != NO_MORE_DOCS; v = gS.nextNeighbor()) {
+      if (v < u || join.contains(v)) {
+        int newv = mapOrd(ordMapS, v);
+        if (newv < 0) {
+          continue;
+        }
+        eps.add(newv);
+        hnsw.seek(0, newv);
+        int friendOrd;
+        while ((friendOrd = hnsw.nextNeighbor()) != NO_MORE_DOCS) {
+          eps.add(friendOrd);
         }
       }
-      addGraphNode(ordMapS[u], eps);
     }
+    return eps;
+  }
+
+  /**
+   * FGIM Phase 1: search every already-inserted source graph for the {@code M} nearest neighbours
+   * of {@code mergedOrd} and add their remapped ordinals to {@code eps}. Entry points must already
+   * exist in the merged graph, so we never query the graph currently being inserted.
+   */
+  private void addCrossQueryEps(IntHashSet eps, int mergedOrd, int currentGraphIndex)
+      throws IOException {
+    scorer.setScoringOrdinal(mergedOrd);
+    int k = M;
+    for (int g = 0; g < currentGraphIndex; g++) {
+      HnswGraph src = graphs[g];
+      if (src == null || src.size() == 0) {
+        continue;
+      }
+      RemappingVectorScorer remap = remapper(g);
+      KnnCollector collector = new TopKnnCollector(k, Integer.MAX_VALUE);
+      HnswGraphSearcher.search(remap, collector, src, null);
+      TopDocs topDocs = collector.topDocs();
+      if (topDocs == null || topDocs.scoreDocs == null) {
+        continue;
+      }
+      for (ScoreDoc sd : topDocs.scoreDocs) {
+        int mapped = mapOrd(ordMaps[g], sd.doc);
+        if (mapped >= 0) {
+          eps.add(mapped);
+        }
+      }
+    }
+  }
+
+  private RemappingVectorScorer remapper(int graphIndex) {
+    if (remappers == null) {
+      remappers = new RemappingVectorScorer[graphs.length];
+    }
+    if (remappers[graphIndex] == null) {
+      remappers[graphIndex] = new RemappingVectorScorer(scorer, ordMaps[graphIndex]);
+    }
+    return remappers[graphIndex];
+  }
+
+  private static int mapOrd(int[] ordMap, int oldOrd) {
+    if (oldOrd < 0 || oldOrd >= ordMap.length) {
+      return -1;
+    }
+    return ordMap[oldOrd];
   }
 }
