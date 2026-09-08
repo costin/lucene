@@ -82,6 +82,16 @@ public class HnswGraphBuilder implements HnswBuilder {
   protected final OnHeapHnswGraph hnsw;
   protected final HnswLock hnswLock;
 
+  /**
+   * When true, {@link #addDiverseNeighbors} writes only the new node's forward neighbors and does
+   * not take {@link HnswLock#write} to install reverse links. Used by {@link
+   * CombinedHnswGraphBuilder} (HNSW-Merger backward-connect).
+   */
+  protected boolean skipReverseLinks;
+
+  /** Incoming-edge recorder used when {@link #skipReverseLinks} is true. May be null. */
+  protected IncomingEdges incomingEdges;
+
   protected InfoStream infoStream = InfoStream.getDefault();
   protected boolean frozen;
 
@@ -106,6 +116,12 @@ public class HnswGraphBuilder implements HnswBuilder {
   /** Set the shared accumulator for tracking cumulative worker time across concurrent chunks. */
   void setCumulativeWorkTimeNs(AtomicLong cumulativeWorkTimeNs) {
     this.cumulativeWorkTimeNs = cumulativeWorkTimeNs;
+  }
+
+  void addWorkTimeNs(long ns) {
+    if (cumulativeWorkTimeNs != null) {
+      cumulativeWorkTimeNs.addAndGet(ns);
+    }
   }
 
   public static HnswGraphBuilder create(
@@ -329,6 +345,9 @@ public class HnswGraphBuilder implements HnswBuilder {
         eps = candidates.popUntilNearestKNodes();
         scratchPerLevel[i] = new NeighborArray(Math.max(candidates.k(), M + 1), false);
         popToScratch(candidates, scratchPerLevel[i]);
+        if (level == 0) {
+          scratchPerLevel[i] = augmentLevel0Candidates(node, scratchPerLevel[i]);
+        }
       }
 
       // then do connections from bottom up
@@ -398,6 +417,18 @@ public class HnswGraphBuilder implements HnswBuilder {
     boolean[] mask =
         selectAndLinkDiverse(node, neighbors, candidates, maxConnOnLevel, scorer, isLinkRepair);
 
+    if (skipReverseLinks) {
+      // Record incoming edges only. Reverse links are installed later by a search-free prune.
+      if (incomingEdges != null && level == 0) {
+        for (int i = 0; i < candidates.size(); i++) {
+          if (mask[i]) {
+            incomingEdges.add(candidates.nodes()[i], node);
+          }
+        }
+      }
+      return;
+    }
+
     // Link the selected nodes to the new node, and the new node to the selected nodes (again
     // applying diversity heuristic)
     // NOTE: here we're using candidates and mask but not the neighbour array because once we have
@@ -433,6 +464,15 @@ public class HnswGraphBuilder implements HnswBuilder {
     }
   }
 
+  /**
+   * Hook for merge builders that want to union extra level-0 candidates (e.g. cross-query of source
+   * graphs) into the beam-search result before diversity prune. Default is identity.
+   */
+  protected NeighborArray augmentLevel0Candidates(int node, NeighborArray scratch)
+      throws IOException {
+    return scratch;
+  }
+
   private void updateNeighbor(
       NeighborArray nbrsOfNbr,
       int node,
@@ -455,7 +495,7 @@ public class HnswGraphBuilder implements HnswBuilder {
    * This method will select neighbors to add and return a mask telling the caller which candidates
    * are selected
    */
-  private boolean[] selectAndLinkDiverse(
+  protected boolean[] selectAndLinkDiverse(
       int node,
       NeighborArray neighbors,
       NeighborArray candidates,

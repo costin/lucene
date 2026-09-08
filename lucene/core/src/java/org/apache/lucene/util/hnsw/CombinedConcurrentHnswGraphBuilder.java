@@ -20,6 +20,7 @@ import static org.apache.lucene.util.hnsw.HnswGraphBuilder.HNSW_COMPONENT;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -34,43 +35,75 @@ import org.apache.lucene.util.FixedBitSet;
 import org.apache.lucene.util.InfoStream;
 
 /**
- * A graph builder that manages multiple workers, it only supports adding the whole graph all at
- * once. It will spawn a thread for each worker and the workers will pick the work in batches.
+ * Concurrent counterpart of {@link CombinedHnswGraphBuilder}. Same insert set as {@link
+ * HnswConcurrentMergeBuilder} / {@link ConcurrentHnswMerger}: copy the largest graph, then insert
+ * every other live node. Reverse links are not installed under {@link HnswLock#write}; workers only
+ * take the (shared) read lock while snapshotting neighbor lists for search. Incoming edges are
+ * appended under a striped lock, then a search-free level-0 prune runs in parallel.
+ *
+ * @lucene.experimental
  */
-public class HnswConcurrentMergeBuilder implements HnswBuilder {
+public final class CombinedConcurrentHnswGraphBuilder implements HnswBuilder {
 
-  private static final int DEFAULT_BATCH_SIZE =
-      2048; // number of vectors the worker handles sequentially at one batch
+  private static final int DEFAULT_BATCH_SIZE = 2048;
 
   private final TaskExecutor taskExecutor;
-  private final ConcurrentMergeWorker[] workers;
+  private final Worker[] workers;
   private final HnswLock hnswLock;
+  private final IncomingEdges incoming;
+  private final IncomingEdges extras;
   private final Set<Long> workerThreadIds = ConcurrentHashMap.newKeySet();
   private volatile double lastEffectiveConcurrency;
   private volatile long lastWallNanos;
+  private volatile long lastPruneNanos;
   private InfoStream infoStream = InfoStream.getDefault();
   private boolean frozen;
 
-  public HnswConcurrentMergeBuilder(
+  /**
+   * @param initializedNodes nodes already copied from the base graph (skipped by workers)
+   * @param sourceGraphs all merge source graphs (index 0 is the base already copied into {@code
+   *     hnsw}); used for cross-query. May be a single-element array.
+   */
+  public CombinedConcurrentHnswGraphBuilder(
       TaskExecutor taskExecutor,
       int numWorker,
       RandomVectorScorerSupplier scorerSupplier,
       int beamWidth,
       OnHeapHnswGraph hnsw,
-      BitSet initializedNodes)
+      BitSet initializedNodes,
+      HnswGraph[] sourceGraphs,
+      int[][] ordMaps)
       throws IOException {
+    if (numWorker < 1) {
+      throw new IllegalArgumentException("numWorker must be >= 1");
+    }
     this.taskExecutor = taskExecutor;
+    this.hnswLock = new HnswLock();
+    int n = Math.max(1, hnsw.maxNodeId() + 1);
+    this.incoming = new IncomingEdges(n);
+    this.extras = new IncomingEdges(n);
+    int[] homeGraph = new int[n];
+    int[] homeOldOrd = new int[n];
+    Arrays.fill(homeGraph, -1);
+    if (sourceGraphs != null && sourceGraphs.length > 0) {
+      CombinedHnswGraphBuilder.fillHomeMaps(sourceGraphs, ordMaps, homeGraph, homeOldOrd);
+    }
     AtomicInteger workProgress = new AtomicInteger(0);
-    workers = new ConcurrentMergeWorker[numWorker];
-    hnswLock = new HnswLock();
+    workers = new Worker[numWorker];
     for (int i = 0; i < numWorker; i++) {
       workers[i] =
-          new ConcurrentMergeWorker(
+          new Worker(
               scorerSupplier.copy(),
               beamWidth,
               HnswGraphBuilder.randSeed,
               hnsw,
               hnswLock,
+              incoming,
+              extras,
+              sourceGraphs,
+              ordMaps,
+              homeGraph,
+              homeOldOrd,
               initializedNodes,
               workProgress,
               workerThreadIds);
@@ -86,10 +119,14 @@ public class HnswConcurrentMergeBuilder implements HnswBuilder {
     if (infoStream.isEnabled(HNSW_COMPONENT)) {
       infoStream.message(
           HNSW_COMPONENT,
-          "build graph from " + maxOrd + " vectors, with " + workers.length + " workers");
+          "build combined graph from "
+              + maxOrd
+              + " vectors, with "
+              + workers.length
+              + " workers (forward-only + prune)");
     }
     AtomicLong cumulativeWorkTimeNs = new AtomicLong();
-    for (ConcurrentMergeWorker worker : workers) {
+    for (Worker worker : workers) {
       worker.setMergeStartTimeNs(mergeStartTimeNs);
       worker.setCumulativeWorkTimeNs(cumulativeWorkTimeNs);
     }
@@ -98,11 +135,26 @@ public class HnswConcurrentMergeBuilder implements HnswBuilder {
       int finalI = i;
       futures.add(
           () -> {
-            workers[finalI].run(maxOrd);
+            workers[finalI].runInsert(maxOrd);
             return null;
           });
     }
     taskExecutor.invokeAll(futures);
+
+    long pruneStart = System.nanoTime();
+    AtomicInteger pruneProgress = new AtomicInteger(0);
+    List<Callable<Void>> pruneFutures = new ArrayList<>();
+    for (int i = 0; i < workers.length; i++) {
+      int finalI = i;
+      pruneFutures.add(
+          () -> {
+            workers[finalI].runPrune(maxOrd, pruneProgress);
+            return null;
+          });
+    }
+    taskExecutor.invokeAll(pruneFutures);
+    lastPruneNanos = System.nanoTime() - pruneStart;
+
     lastWallNanos = System.nanoTime() - mergeStartTimeNs;
     double wallClockMs = lastWallNanos / 1_000_000.0;
     double totalWorkerMs = cumulativeWorkTimeNs.get() / 1_000_000.0;
@@ -112,13 +164,46 @@ public class HnswConcurrentMergeBuilder implements HnswBuilder {
           HNSW_COMPONENT,
           String.format(
               Locale.ROOT,
-              "merge completed: %d vectors, %.2f ms wall clock, %.2f ms cumulative worker time, %.2fx effective concurrency",
+              "combined merge completed: %d vectors, %.2f ms wall, %.2f ms prune, %.2f ms worker, %.2fx effective concurrency",
               maxOrd,
               wallClockMs,
+              lastPruneNanos / 1_000_000.0,
               totalWorkerMs,
               lastEffectiveConcurrency));
     }
     return getCompletedGraph();
+  }
+
+  @Override
+  public void addGraphNode(int node) {
+    throw new UnsupportedOperationException("This builder is for merge only");
+  }
+
+  @Override
+  public void addGraphNode(int node, IntHashSet eps) {
+    throw new UnsupportedOperationException("This builder is for merge only");
+  }
+
+  @Override
+  public void setInfoStream(InfoStream infoStream) {
+    this.infoStream = infoStream;
+    for (Worker worker : workers) {
+      worker.setInfoStream(infoStream);
+    }
+  }
+
+  @Override
+  public OnHeapHnswGraph getCompletedGraph() throws IOException {
+    if (frozen == false) {
+      workers[0].getCompletedGraph();
+      frozen = true;
+    }
+    return getGraph();
+  }
+
+  @Override
+  public OnHeapHnswGraph getGraph() {
+    return workers[0].getGraph();
   }
 
   public long writeLockWaitNanos() {
@@ -127,6 +212,14 @@ public class HnswConcurrentMergeBuilder implements HnswBuilder {
 
   public long writeLockCount() {
     return hnswLock.writeCount();
+  }
+
+  public long incomingWaitNanos() {
+    return incoming.addWaitNanos();
+  }
+
+  public long incomingCount() {
+    return incoming.addCount();
   }
 
   public Set<Long> workerThreadIds() {
@@ -141,72 +234,32 @@ public class HnswConcurrentMergeBuilder implements HnswBuilder {
     return lastWallNanos;
   }
 
+  public long lastPruneNanos() {
+    return lastPruneNanos;
+  }
+
   public int numWorkers() {
     return workers.length;
   }
 
-  @Override
-  public void addGraphNode(int node) throws IOException {
-    throw new UnsupportedOperationException("This builder is for merge only");
-  }
-
-  @Override
-  public void addGraphNode(int node, IntHashSet eps) throws IOException {
-    throw new UnsupportedOperationException("This builder is for merge only");
-  }
-
-  @Override
-  public void setInfoStream(InfoStream infoStream) {
-    this.infoStream = infoStream;
-    for (HnswBuilder worker : workers) {
-      worker.setInfoStream(infoStream);
-    }
-  }
-
-  @Override
-  public OnHeapHnswGraph getCompletedGraph() throws IOException {
-    if (frozen == false) {
-      // should already have been called in build(), but just in case
-      finish();
-      frozen = true;
-    }
-    return getGraph();
-  }
-
-  private void finish() throws IOException {
-    workers[0].finish();
-  }
-
-  @Override
-  public OnHeapHnswGraph getGraph() {
-    return workers[0].getGraph();
-  }
-
-  /* test only for now */
-  void setBatchSize(int newSize) {
-    for (ConcurrentMergeWorker worker : workers) {
-      worker.batchSize = newSize;
-    }
-  }
-
-  private static final class ConcurrentMergeWorker extends HnswGraphBuilder {
-
-    /**
-     * A common AtomicInteger shared among all workers, used for tracking what's the next vector to
-     * be added to the graph.
-     */
-    private final AtomicInteger workProgress;
-
+  private static final class Worker extends CombinedHnswGraphBuilder {
     private final BitSet initializedNodes;
+    private final AtomicInteger workProgress;
     private final Set<Long> workerThreadIds;
     private int batchSize = DEFAULT_BATCH_SIZE;
 
-    private ConcurrentMergeWorker(
+    private Worker(
         RandomVectorScorerSupplier scorerSupplier,
         int beamWidth,
         long seed,
         OnHeapHnswGraph hnsw,
         HnswLock hnswLock,
+        IncomingEdges incoming,
+        IncomingEdges extras,
+        HnswGraph[] graphs,
+        int[][] ordMaps,
+        int[] homeGraph,
+        int[] homeOldOrd,
         BitSet initializedNodes,
         AtomicInteger workProgress,
         Set<Long> workerThreadIds)
@@ -218,37 +271,44 @@ public class HnswConcurrentMergeBuilder implements HnswBuilder {
           hnsw,
           hnswLock,
           new LockedHnswGraphSearcher(
-              new NeighborQueue(beamWidth, true), hnswLock, new FixedBitSet(hnsw.maxNodeId() + 1)));
-      this.workProgress = workProgress;
+              new NeighborQueue(beamWidth, true), hnswLock, new FixedBitSet(hnsw.maxNodeId() + 1)),
+          incoming,
+          extras,
+          graphs,
+          ordMaps,
+          homeGraph,
+          homeOldOrd,
+          initializedNodes);
       this.initializedNodes = initializedNodes;
+      this.workProgress = workProgress;
       this.workerThreadIds = workerThreadIds;
     }
 
-    /**
-     * This method first try to "reserve" part of work by calling {@link #getStartPos(int)} and then
-     * calling {@link #addVectors(int, int)} to actually add the nodes to the graph. By doing this
-     * we are able to dynamically allocate the work to multiple workers and try to make all of them
-     * finishing around the same time.
-     */
-    private void run(int maxOrd) throws IOException {
+    private void runInsert(int maxOrd) throws IOException {
       workerThreadIds.add(Thread.currentThread().threadId());
-      int start = getStartPos(maxOrd);
-      int end;
+      int start = getStartPos(maxOrd, workProgress, batchSize);
       while (start != -1) {
-        end = Math.min(maxOrd, start + batchSize);
+        int end = Math.min(maxOrd, start + batchSize);
         addVectors(start, end);
-        start = getStartPos(maxOrd);
+        start = getStartPos(maxOrd, workProgress, batchSize);
       }
     }
 
-    /** Reserve the work by atomically increment the {@link #workProgress} */
-    private int getStartPos(int maxOrd) {
-      int start = workProgress.getAndAdd(batchSize);
-      if (start < maxOrd) {
-        return start;
-      } else {
-        return -1;
+    private void runPrune(int maxOrd, AtomicInteger progress) throws IOException {
+      workerThreadIds.add(Thread.currentThread().threadId());
+      long pruneStart = System.nanoTime();
+      int start = getStartPos(maxOrd, progress, batchSize);
+      int maxConn = M * 2;
+      while (start != -1) {
+        int end = Math.min(maxOrd, start + batchSize);
+        for (int v = start; v < end; v++) {
+          if (needsPrune(v)) {
+            pruneNode(v, maxConn);
+          }
+        }
+        start = getStartPos(maxOrd, progress, batchSize);
       }
+      addWorkTimeNs(System.nanoTime() - pruneStart);
     }
 
     @Override
@@ -258,5 +318,10 @@ public class HnswConcurrentMergeBuilder implements HnswBuilder {
       }
       super.addGraphNode(node);
     }
+  }
+
+  private static int getStartPos(int maxOrd, AtomicInteger workProgress, int batchSize) {
+    int start = workProgress.getAndAdd(batchSize);
+    return start < maxOrd ? start : -1;
   }
 }
