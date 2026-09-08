@@ -17,6 +17,7 @@
 
 package org.apache.lucene.util.hnsw;
 
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -27,6 +28,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 final class HnswLock {
   private static final int NUM_LOCKS = 512;
   private final ReentrantReadWriteLock[] locks;
+  private final AtomicLong writeWaitNanos = new AtomicLong();
+  private final AtomicLong writeCount = new AtomicLong();
 
   HnswLock() {
     locks = new ReentrantReadWriteLock[NUM_LOCKS];
@@ -45,8 +48,19 @@ final class HnswLock {
   Lock write(int level, int node) {
     int lockid = hash(level, node) % NUM_LOCKS;
     Lock lock = locks[lockid].writeLock();
+    long t0 = System.nanoTime();
     lock.lock();
+    writeWaitNanos.addAndGet(System.nanoTime() - t0);
+    writeCount.incrementAndGet();
     return lock;
+  }
+
+  long writeWaitNanos() {
+    return writeWaitNanos.get();
+  }
+
+  long writeCount() {
+    return writeCount.get();
   }
 
   private static int hash(int v1, int v2) {

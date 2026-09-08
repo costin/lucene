@@ -226,7 +226,7 @@ public class HnswGraphSearcher extends AbstractHnswGraphSearcher {
       return new int[] {currentEp};
     }
     int size = getGraphSize(graph);
-    prepareScratchState(size, graph.maxConn() * 2);
+    prepareScratchState(size, graph.maxConn() * 2 + 2);
     float currentScore = scorer.score(currentEp);
     collector.incVisitedCount(1);
     boolean foundBetter;
@@ -287,7 +287,7 @@ public class HnswGraphSearcher extends AbstractHnswGraphSearcher {
 
     int size = getGraphSize(graph);
 
-    prepareScratchState(size, graph.maxConn() * 2);
+    prepareScratchState(size, graph.maxConn() * 2 + 2);
     if (bulkScores == null || bulkScores.length < eps.length) {
       bulkScores = new float[eps.length];
     }
